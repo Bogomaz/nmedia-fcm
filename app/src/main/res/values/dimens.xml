@@ -10,6 +10,7 @@
     <dimen name="icon_size">24dp</dimen>
     <dimen name="views_count_size">40dp</dimen>
     <dimen name="shares_count_size">40dp</dimen>
-    <dimen name="likes_count_size">40dp</dimen>
+    <dimen name="comments_count_size">40dp</dimen>
+    <dimen name="likes_count_size">48dp</dimen>
 
 </resources>

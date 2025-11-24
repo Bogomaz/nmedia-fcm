@@ -85,11 +85,12 @@
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
         android:layout_marginVertical="@dimen/common_spacing"
+        android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/likes_count"
+        app:layout_constraintEnd_toStartOf="@id/likes_count"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/content_bottom_br"
-        app:layout_constraintEnd_toStartOf="@id/likes_count"
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/heart_outline_24" />
 
@@ -97,10 +98,12 @@
         android:id="@+id/likes_count"
         android:layout_width="@dimen/likes_count_size"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/mini_spacing"
         android:layout_marginStart="@dimen/mini_spacing"
         app:layout_constraintStart_toEndOf="@id/likes"
         app:layout_constraintTop_toTopOf="@id/likes"
         app:layout_constraintBottom_toBottomOf="@id/likes"
+        app:layout_constraintEnd_toStartOf="@id/shares"
         tools:text="@sample/posts.json/data/likesCount"/>
 
     <ImageButton
@@ -108,6 +111,7 @@
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
         android:layout_marginVertical="@dimen/common_spacing"
+        android:layout_marginHorizontal="@dimen/mini_spacing"
         android:background="@android:color/transparent"
         android:contentDescription="@string/likes_count"
         app:layout_constraintStart_toEndOf="@id/likes_count"
@@ -118,23 +122,47 @@
 
     <TextView
         android:id="@+id/shares_count"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/shares_count_size"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/mini_spacing"
         app:layout_constraintStart_toEndOf="@id/shares"
         app:layout_constraintTop_toTopOf="@id/shares"
         app:layout_constraintBottom_toBottomOf="@id/shares"
-        app:layout_constraintEnd_toStartOf="@id/views"
+        app:layout_constraintEnd_toStartOf="@id/comments"
         tools:text="@sample/posts.json/data/shareCount" />
+
+    <ImageButton
+        android:id="@+id/comments"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_marginHorizontal="@dimen/mini_spacing"
+        android:layout_marginVertical="@dimen/common_spacing"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/likes_count"
+        app:layout_constraintStart_toEndOf="@id/shares_count"
+        app:layout_constraintTop_toBottomOf="@id/content_bottom_br"
+        app:layout_constraintEnd_toStartOf="@id/comments_count"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:srcCompat="@drawable/comment_outline" />
+
+    <TextView
+        android:id="@+id/comments_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+          app:layout_constraintStart_toEndOf="@id/comments"
+        app:layout_constraintTop_toTopOf="@id/comments"
+        app:layout_constraintBottom_toBottomOf="@id/comments"
+        app:layout_constraintEnd_toStartOf="@id/views"
+        tools:text="@sample/posts.json/data/commentsCount" />
 
     <ImageButton
         android:id="@+id/views"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
+        android:layout_marginHorizontal="@dimen/mini_spacing"
         android:layout_marginVertical="@dimen/common_spacing"
         android:background="@android:color/transparent"
         android:contentDescription="@string/views_count"
-        app:layout_constraintStart_toEndOf="@id/shares_count"
+        app:layout_constraintStart_toEndOf="@id/comments_count"
         app:layout_constraintTop_toBottomOf="@id/content_bottom_br"
         app:layout_constraintEnd_toStartOf="@id/views_count"
         app:srcCompat="@drawable/eye"/>
@@ -143,7 +171,6 @@
         android:id="@+id/views_count"
         android:layout_width="@dimen/views_count_size"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/mini_spacing"
         android:layout_marginVertical="@dimen/common_spacing"
         app:layout_constraintStart_toEndOf="@id/views"
         app:layout_constraintTop_toBottomOf="@id/content_bottom_br"

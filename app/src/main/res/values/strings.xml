@@ -5,6 +5,7 @@
     <string name="description_post_menu">Post menu</string>
     <string name="content">Content</string>
     <string name="likes_count">It liked</string>
+    <string name="comments_count">It commented</string>
     <string name="shares_count">It shared</string>
     <string name="views_count">It viewed</string>
 

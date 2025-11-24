@@ -7,5 +7,6 @@
     <string name="content">Контент</string>
     <string name="likes_count">Это понравилось"</string>
     <string name="shares_count">Этим поделились"</string>
+    <string name="comments_count">Это прокомментировали</string>
     <string name="views_count">Это посмотрели</string>
 </resources>
