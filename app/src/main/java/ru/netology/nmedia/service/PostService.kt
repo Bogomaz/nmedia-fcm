@@ -2,7 +2,9 @@ package ru.netology.nmedia.service
 
 import ru.netology.nmedia.R
 import ru.netology.nmedia.model.Comment
+import ru.netology.nmedia.model.Likes
 import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.model.Reposts
 import kotlin.math.round
 
 object PostService {
@@ -53,21 +55,32 @@ object PostService {
     // Принимает id пользователя и id поста.
     // Cтавит отметку о том, что данный пользователь поставил/снял лайк
     // Возвращает новое количество лайков
-    fun likeHandler(userId: Int, postId: Int) {
+    fun likeHandler(userId: Int, postId: Int): Post{
         val post = getById(postId)
-        when (post.likes!!.userLikes) {
-            true -> post.likes!!.count -= 1 //post.likes!!.count - 1
-            false -> post.likes!!.count += 1 //post.likes!!.count + 1
+        val updatedLikes = post.likes?.let{
+            Likes(
+                userLikes = !it.userLikes,
+                count = if (it.userLikes) --it.count else ++it.count
+            )
         }
-        post.likes!!.userLikes = !post.likes!!.userLikes
+        val updatedPost = post.copy(likes = updatedLikes)
+        update(updatedPost)
+
+        return updatedPost
     }
 
     // Принимает id пользователя и id поста.
     // Cтавит отметку о том, что данный пользователь поставил/снял лайк
     // Возвращает новое количество лайков
-    fun repostHandler(postId: Int) {
+    fun repostHandler(postId: Int): Post {
         val post = getById(postId)
-        post.reposts!!.count += 1
+        val updatedReposts = post.reposts?.let{
+            Reposts(
+                count = ++it.count
+            )
+        }
+        val updatedPost = post.copy(reposts = updatedReposts)
+        return updatedPost
     }
 
     //Принимает число с количеством взаимодействий с постом
