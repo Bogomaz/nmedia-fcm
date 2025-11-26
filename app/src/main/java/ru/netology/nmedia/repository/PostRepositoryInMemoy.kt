@@ -13,7 +13,9 @@ import ru.netology.nmedia.service.PostService
 
 
 class PostRepositoryInMemoy : PostRepository {
+    // пользователь-заглушка
     val userId = 1
+    // пост-заглушка
     val post = PostService.add(
         Post(
             fromId = 1,
@@ -57,11 +59,17 @@ class PostRepositoryInMemoy : PostRepository {
 
     override fun get(): LiveData<Post> = data
 
+    // Получает свежий пост из LiveData
+    // Обращается к PostService.likeHandler за новым состоянием лайков
+    // Изменяет LiveData
     override fun like() {
         val currentPost = data.value ?: return
         data.value = PostService.likeHandler(userId, currentPost.id)
     }
 
+    // Получает свежий пост из LiveData
+    // Обращается к PostService.repostHandler за новым состоянием репостов
+    // Изменяет LiveData
     override fun repost() {
         val currentPost = data.value ?: return
         data.value = PostService.repostHandler(currentPost.id)

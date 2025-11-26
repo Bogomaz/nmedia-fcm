@@ -1,32 +1,16 @@
 package ru.netology.nmedia
 
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import ru.netology.nmedia.databinding.ActivityMainBinding
-import ru.netology.nmedia.model.Comments
-import ru.netology.nmedia.model.Likes
-import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.model.PostType
-import ru.netology.nmedia.model.Privacy
-import ru.netology.nmedia.model.Reposts
 import ru.netology.nmedia.model.User
-import ru.netology.nmedia.model.Views
 import ru.netology.nmedia.service.PostService
 import ru.netology.nmedia.viewmodel.PostViewModel
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Date
 import java.util.Locale
 import kotlin.Int
 import androidx.activity.viewModels
@@ -46,8 +30,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        val testPost = PostService.add(post);
-
         val binding = ActivityMainBinding.inflate(layoutInflater)
 
         viewModel.data.observe(this) { testPost ->
@@ -65,6 +47,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+
         binding.likes.setOnClickListener {
             viewModel.like()
         }
@@ -75,6 +58,7 @@ class MainActivity : AppCompatActivity() {
        setContentView(binding.root)
     }
 
+    // ==== Эти функции пока полежат тут
     // Конвертирует и форматирует UnixTime в строку с датой и временем публикации
     @RequiresApi(Build.VERSION_CODES.O)
     fun formatUnixTime(unixDateTime: Int): String {

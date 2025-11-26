@@ -1,12 +1,6 @@
 package ru.netology.nmedia.model
 
 data class Post(
-//    val id: Long = 0,
-//    var authorName: String? = "",
-//    val publicationDate: String? = "",
-//    val content: String = "",
-//    var likedByMe: Boolean
-
     override val id: Int = 0,
     override val fromId: Int = 0,
     override val ownerId: Int = 0,
