@@ -60,7 +60,7 @@ object PostService {
         val updatedLikes = post.likes?.let{
             Likes(
                 userLikes = !it.userLikes,
-                count = if (it.userLikes) --it.count else ++it.count
+                count = if (it.userLikes) it.count-1 else it.count+1
             )
         }
         val updatedPost = post.copy(likes = updatedLikes)
@@ -76,10 +76,11 @@ object PostService {
         val post = getById(postId)
         val updatedReposts = post.reposts?.let{
             Reposts(
-                count = ++it.count
+                count = it.count+1
             )
         }
         val updatedPost = post.copy(reposts = updatedReposts)
+        update(updatedPost)
         return updatedPost
     }
 
