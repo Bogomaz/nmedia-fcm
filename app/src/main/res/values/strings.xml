@@ -11,6 +11,12 @@
     <string name="edit">Edit</string>>
     <string name="remove">Remove</string>
     <string name="new_post_text">Enter a post text</string>
+    <string name="add_new_post">Add a new post</string>
     <string name="empty_post_text">The post text is empty</string>
+    <string name="blank_text_error">Text is blank</string>
+    <string name="created_post_title">Create post</string>
+    <string name="edited_post_title">Edit post</string>
+    <string name="play">Play</string>
+    <string name="invalid_link">Unable to open link</string>
 
 </resources>

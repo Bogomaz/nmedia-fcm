@@ -12,6 +12,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nmedia">
         <activity
+            android:name=".PostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".IntentHandlerActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">

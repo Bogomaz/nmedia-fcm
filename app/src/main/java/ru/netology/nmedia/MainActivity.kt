@@ -1,10 +1,13 @@
 package ru.netology.nmedia
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.nmedia.databinding.ActivityMainBinding
@@ -21,6 +24,14 @@ import ru.netology.nmedia.utils.AndroidUtils
 class MainActivity : AppCompatActivity() {
 
     val viewModel: PostViewModel by viewModels()
+
+    val postLauncher = registerForActivityResult(PostActivityContract()) { result ->
+        val editingPost = viewModel.edited.value
+        if(editingPost != null && result != null) {
+            val updatedPost = editingPost.copy(text = result)
+            viewModel.save(updatedPost.text)
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,10 +53,24 @@ class MainActivity : AppCompatActivity() {
         val adapter = PostsAdapter(object : PostListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
+                postLauncher.launch(post.text)
             }
 
             override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
+            }
+
+            override fun onPlayVideo(post: Post) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
+                try{
+                    startActivity(intent)
+                }catch(e:Exception){
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.invalid_link),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             override fun onLike(post: Post) {
@@ -54,6 +79,21 @@ class MainActivity : AppCompatActivity() {
 
             override fun onRepost(post: Post) {
                 viewModel.repostById(post.id)
+
+                // Когда нужно поделиться данными с другими приложениями через intent
+                val intent = Intent()
+                    .putExtra(Intent.EXTRA_TEXT, post.text)
+                    .setAction(Intent.ACTION_SEND)
+                    .setType("text/plain")
+                try {
+                    startActivity(Intent.createChooser(intent, null))
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Apps not found",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         })
         binding.postList.adapter = adapter // созданный адаптер помещаем в Recycler View с постами
@@ -75,46 +115,10 @@ class MainActivity : AppCompatActivity() {
             adapter.submitList(posts)
         }
 
-        // Подписываемся на изменения редактируемого поста
-        viewModel.edited.observe(this)
-        { post ->
-            binding.apply {
-                if (post.id > 0) {
-                    //Режим редактирования: показываем блок, заполняем текст,
-                    // ставим фокус и открываем клавиатуру
-                    newText.setText(post.text)
-                    editedGroup.visibility = View.VISIBLE
-                    editedPostTitle.text = post.text
-                    newText.requestFocus()
-                    AndroidUtils.showKeyboard(binding.newText)
-                }
-                // Режим отмены: скрываем блок, очищаем поле и убираем фокус
-                else {
-                    editedGroup.visibility = View.GONE
-                    newText.setText("")
-                    newText.clearFocus()
-                }
-            }
-        }
-
-
-        // Обработчик кнопки Отменить редактирование
-        binding.cancelEdit.setOnClickListener() {
-            viewModel.cancelEdit()
-        }
-
         //Обработчик кнопки Сохранить
-        binding.save.setOnClickListener()
+        binding.addNewPost.setOnClickListener()
         {
-            with(binding.newText) {
-                val newText = text.toString()
-                if (newText.isBlank()) {
-                    Toast.makeText(context, R.string.empty_post_text, Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                viewModel.save(newText)
-                AndroidUtils.hideKeyboard(this)
-            }
+            postLauncher.launch(null)
         }
     }
 }

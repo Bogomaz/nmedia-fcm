@@ -5,6 +5,7 @@ data class Post(
     val date: Int = 0,
     val author: String = "",
     val text: String = "",
+    val video: String = "",
     val commentsCount: Int = 0,
     val likesCount: Int = 0,
     val isLiked: Boolean = false,

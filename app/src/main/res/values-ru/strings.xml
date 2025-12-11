@@ -12,5 +12,11 @@
     <string name="edit">Редактировать</string>>
     <string name="remove">Удалить</string>
     <string name="new_post_text">Введите текст поста</string>
+    <string name="add_new_post">Создать новый пост</string>
     <string name="empty_post_text">Пост не может быть пустым</string>
+    <string name="blank_text_error">Текст отсутствует!</string>
+    <string name="created_post_title">Создание поста</string>
+    <string name="edited_post_title">Редактирование поста</string>
+    <string name="play">Смотреть</string>
+    <string name="invalid_link">Невозможно открыть ссылку</string>
 </resources>

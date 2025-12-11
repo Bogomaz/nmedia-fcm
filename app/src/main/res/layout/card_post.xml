@@ -12,7 +12,6 @@
         android:layout_height="@dimen/avatar_size"
         android:layout_marginBottom="@dimen/common_spacing"
         android:contentDescription="@string/description_post_author_avatar_menu"
-        app:layout_constraintBottom_toBottomOf="@id/top_content_br"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@sample/posts.json/data/authorAvatar" />
@@ -50,9 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/common_spacing"
         android:contentDescription="@string/description_post_menu"
+        app:icon="@drawable/dots_vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:icon="@drawable/dots_vertical" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/top_content_br"
@@ -60,6 +59,118 @@
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="avatar, published, menu" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/content"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_content_br">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/mock" />
+
+        <LinearLayout
+            android:id="@+id/videoHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_spacing"
+            android:orientation="horizontal"
+            android:padding="@dimen/common_spacing"
+            app:layout_constraintBottom_toTopOf="@id/playButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/videoDate"
+                style="@style/TextAppearance.Material3.LabelLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="24 ДЕКАБРЯ 19:00"
+                android:textColor="@android:color/white" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="@dimen/icon_size_small"
+                android:layout_height="@dimen/icon_size_small"
+                android:layout_marginEnd="@dimen/mini_spacing"
+                android:src="@drawable/avatar" />
+
+            <TextView
+                android:id="@+id/videoAuthor"
+                style="@style/TextAppearance.Material3.LabelLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Нетология"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/playButton"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/play"
+            app:icon="@drawable/play_circle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/videoFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/common_spacing"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/videoDescription"
+                style="@style/TextAppearance.Material3.TitleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Иллюстрация в медиа"
+                android:textColor="@android:color/white" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/videoDuration"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/mini_spacing"
+                    android:background="@drawable/rounded_bg"
+                    android:paddingHorizontal="@dimen/common_spacing"
+                    android:paddingVertical="@dimen/mini_spacing"
+                    android:text="00:51"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <TextView
         android:id="@+id/content"
@@ -69,7 +180,7 @@
         android:autoLink="web"
         android:text="@sample/posts.json/data/content"
         app:layout_constraintBottom_toBottomOf="@id/content_bottom_br"
-        app:layout_constraintTop_toBottomOf="@id/top_content_br" />
+        app:layout_constraintTop_toBottomOf="@id/video" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/content_bottom_br"
@@ -95,7 +206,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/likes_count"
         app:icon="@drawable/share_24"
-        app:layout_constraintTop_toBottomOf="@id/content_bottom_br"/>
+        app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/comments"
@@ -105,7 +216,7 @@
         android:contentDescription="@string/likes_count"
         android:enabled="false"
         app:icon="@drawable/comment_outline"
-        app:layout_constraintTop_toBottomOf="@id/content_bottom_br"/>
+        app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/views"
@@ -115,7 +226,7 @@
         android:contentDescription="@string/views_count"
         android:enabled="false"
         app:icon="@drawable/ic_eye"
-        app:layout_constraintTop_toBottomOf="@id/content_bottom_br"/>
+        app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
 
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow"
@@ -124,8 +235,8 @@
         app:constraint_referenced_ids="likes, shares, comments, views"
         app:flow_horizontalGap="@dimen/mini_spacing"
         app:flow_wrapMode="none"
-        app:layout_constraintTop_toBottomOf="@id/content_bottom_br"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainScroll"
@@ -9,122 +9,32 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/postList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/contentBarrier"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/card_post" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/contentBarrier"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/short_spacing"
-        android:layout_margin="@dimen/big_spacing"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postList"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/editTitle"/>
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/editedGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="editIndicator, editTitle, editedPostTitle, cancelEdit"/>
-    <ImageView
-        android:id="@+id/editIndicator"
-        android:src="@drawable/ic_edit"
-        android:background="@android:color/transparent"
-        android:paddingVertical="@dimen/common_spacing"
-        android:paddingHorizontal="@dimen/short_spacing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
-        app:layout_constraintEnd_toStartOf="@id/editTitle"
-        app:layout_constraintBottom_toTopOf="@id/editBarrier"
-        />
-
-    <TextView
-        android:id="@+id/editTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/mini_spacing"
-        android:text="Вы редактируете"
-        android:textColor="@color/blue"
-        android:textStyle="bold"
-        android:textSize="@dimen/edit_title_size"
-        app:layout_constraintStart_toEndOf="@id/editIndicator"
-        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
-        app:layout_constraintBottom_toTopOf="@id/editedPostTitle"
-        app:layout_constraintEnd_toEndOf="@id/cancelEdit" />
-    <TextView
-        android:id="@+id/editedPostTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:singleLine="true"
-        android:padding="@dimen/mini_spacing"
-        android:textSize="@dimen/edit_title_size"
-        app:layout_constraintTop_toBottomOf="@id/editTitle"
-        app:layout_constraintEnd_toStartOf="@id/cancelEdit"
-        app:layout_constraintStart_toEndOf="@id/editIndicator"
-        app:layout_constraintBottom_toTopOf="@id/editBarrier"
-        android:text="" />
-
-    <ImageView
-        android:id="@+id/cancelEdit"
-        android:src="@drawable/ic_close_editing"
-        android:background="@android:color/transparent"
-        android:padding="@dimen/common_spacing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/editTitle"
-        app:layout_constraintTop_toBottomOf="@id/contentBarrier"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/editBarrier"/>
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/editBarrier"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/short_spacing"
-        android:layout_margin="@dimen/big_spacing"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editedPostTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/newText"/>
-
-    <EditText
-        android:id="@+id/newText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_margin="@dimen/common_spacing"
-        android:background="@android:color/transparent"
-        android:hint="@string/new_post_text"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:padding="@dimen/common_spacing"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editBarrier"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/save"
-        />
+        android:paddingBottom="72dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/card_post"
+    />
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:fabAlignmentMode="center"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/save"
-        style="?attr/materialIconButtonFilledStyle"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addNewPost"
+        android:contentDescription="@string/add_new_post"
         android:padding="@dimen/common_spacing"
+        android:src="@drawable/plus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/common_spacing"
-        app:layout_constraintStart_toEndOf="@id/newText"
-        app:layout_constraintTop_toBottomOf="@id/editBarrier"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:icon="@drawable/ic_save"/>
+        app:icon="@drawable/ic_save"
+        app:layout_anchor="@id/bottomAppBar"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

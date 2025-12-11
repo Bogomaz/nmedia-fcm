@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
@@ -25,6 +26,7 @@ interface PostListener {
     fun onRemove(post: Post)
     fun onLike(post: Post)
     fun onRepost(post: Post)
+    fun onPlayVideo(post: Post)
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -63,11 +65,13 @@ class PostViewHolder(
             avatar.setImageResource(R.drawable.avatar)
             published.text = DateTimeService.formatUnixTime(post.date)
             content.text = post.text
+            if(post.video != "") video.visibility = View.VISIBLE else video.visibility = View.GONE
             likes.isChecked = post.isLiked
             likes.text = PostService.convertNumberIntoText(post.likesCount)
             shares.text = PostService.convertNumberIntoText(post.repostsCount)
             comments.text = PostService.convertNumberIntoText(post.commentsCount)
             views.text = PostService.convertNumberIntoText(post.viewsCount)
+
             likes.setOnClickListener {
                 listener.onLike(post)
             }
@@ -75,6 +79,11 @@ class PostViewHolder(
             shares.setOnClickListener {
                 listener.onRepost(post)
             }
+
+            playButton.setOnClickListener {
+                listener.onPlayVideo(post)
+            }
+
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.post_menu)
@@ -96,14 +105,6 @@ class PostViewHolder(
                     show()
                 }
             }
-        }
-    }
-
-    // Определяет, какая иконка будет выводиться.
-    fun selectImageResource(isLiked: Boolean): Int {
-        return when (isLiked) {
-            true -> R.drawable.ic_like_filled
-            false -> R.drawable.ic_like
         }
     }
 }
