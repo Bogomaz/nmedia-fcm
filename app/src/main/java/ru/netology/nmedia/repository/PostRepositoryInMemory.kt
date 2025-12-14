@@ -1,11 +1,11 @@
 package ru.netology.nmedia.repository
 
 import android.content.Context
-import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import ru.netology.nmedia.initPosts
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.service.PostService
 import java.lang.reflect.Type
@@ -13,16 +13,13 @@ import kotlin.inc
 
 
 class PostRepositoryInMemory(
-    context: Context
+    private val context: Context
 ) : PostRepository {
 
-    // создаётся хранилище простых данных data.
-    // оно доступно через prefs
-    private val prefs = context.getSharedPreferences("data", Context.MODE_PRIVATE)
 
     //Загружаем в список данные из shared pref.
     //Сеттер обновляет shared pref и live data
-    private var posts: List<Post> = getPosts()
+    private var posts: List<Post> = getOrInitPosts()
         set(value) {
             field = value
             sync() // обновляем shared pref
@@ -37,8 +34,8 @@ class PostRepositoryInMemory(
     // Создаёт новый пост, добавляет его в live data, вызывает обновление shared pref.
     override fun save(post: Post) {
         posts = if (post.id == 0) {
-            val currentId = posts.maxOfOrNull { it.id } ?: 0
-            val newPost = PostService.createPost(post, currentId)
+//            val currentId = posts.maxOfOrNull { it.id } ?: 0
+            val newPost = PostService.createPost(post, getCurrentId())
             listOf(newPost) + posts
         } else {
             posts.map {
@@ -74,21 +71,38 @@ class PostRepositoryInMemory(
         posts = posts.filter { it.id != id }
     }
 
-    // Чтение данных из shared preferences
-    private fun getPosts(): List<Post> = prefs.getString(POSTS_KEY, null)?.let {
-        gson.fromJson(it, postsType)
-    } ?: emptyList()
-
-    // запись в shared preferences изменённого списка постов
-    private fun sync() {
-        prefs.edit {
-            putString(POSTS_KEY, gson.toJson(posts))
+    // Чтение данных из файла
+    private fun getOrInitPosts(): List<Post>{
+        val file = context.filesDir.resolve(FILE_NAME)
+        return if(!file.exists()||file.length() == 0L){
+            file.outputStream().bufferedWriter().use{
+                it.write(gson.toJson(initPosts))
+            }
+            initPosts
+        }else{
+            file.inputStream()
+                .bufferedReader()
+                .use {
+                    gson.fromJson(it, postsType)
+                }
         }
     }
 
+    // запись в файл изменённого списка постов
+    private fun sync() {
+        context.filesDir.resolve(FILE_NAME)
+            .outputStream()
+            .bufferedWriter()
+            .use{
+                it.write(gson.toJson(posts))
+            }
+    }
+
+    private fun getCurrentId() = posts.maxOfOrNull { it.id } ?: 0
+
     // Константы
     private companion object {
-        const val POSTS_KEY = "posts" // ключ сохранения/ получения данных из shared preferences
+        const val FILE_NAME = "posts.json"
         val gson = Gson() // Gson-объект
         val postsType: Type =
             object : TypeToken<List<Post>>() {}.type // тип объекта - список постов
