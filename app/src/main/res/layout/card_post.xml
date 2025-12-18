@@ -176,6 +176,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/common_spacing"
+        android:maxLines="10"
+        android:ellipsize="end"
         android:autoLink="web"
         android:text="@sample/posts.json/data/content"
         app:layout_constraintBottom_toBottomOf="@id/content_bottom_br"

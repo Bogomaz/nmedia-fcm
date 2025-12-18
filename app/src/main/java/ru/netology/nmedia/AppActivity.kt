@@ -11,7 +11,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.databinding.ActivityAppBinding
-import ru.netology.nmedia.fragments.NewPostFragment.Companion.textArg
 
 class AppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,8 +39,7 @@ class AppActivity : AppCompatActivity() {
                 Log.d("IntentHandlerActivity", text)
             }
             binding.navController.getFragment<NavHostFragment>().navController.navigate(
-                R.id.action_feedFragment_to_newPostFragment,
-                Bundle().apply { textArg = text }
+                R.id.action_feedFragment_to_editPostFragment,
             )
         }
     }

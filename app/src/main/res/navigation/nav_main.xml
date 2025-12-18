@@ -11,12 +11,44 @@
         android:label="fragment_feed"
         tools:layout="@layout/fragment_feed" >
         <action
-            android:id="@+id/action_feedFragment_to_newPostFragment"
-            app:destination="@id/newPostFragment" />
+            android:id="@+id/action_feedFragment_to_editPostFragment"
+            app:destination="@id/editPostFragment">
+        </action>
+        <action
+            android:id="@+id/action_feedFragment_to_readPostFragment"
+            app:destination="@id/readPostFragment">
+        </action>
     </fragment>
     <fragment
-        android:id="@+id/newPostFragment"
-        android:name="ru.netology.nmedia.fragments.NewPostFragment"
+        android:id="@+id/editPostFragment"
+        android:name="ru.netology.nmedia.fragments.EditPostFragment"
         android:label="fragment_new_post"
-        tools:layout="@layout/fragment_new_post" />
+        tools:layout="@layout/fragment_edit_post">
+        <argument
+            android:name="postText"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="postId"
+            app:argType="integer"
+            android:defaultValue="0"/>
+    </fragment>
+    <fragment
+        android:id="@+id/readPostFragment"
+        android:name="ru.netology.nmedia.fragments.ReadPostFragment"
+        android:label="fragment_read_post"
+        tools:layout="@layout/fragment_read_post">
+        <action
+            android:id="@+id/action_readPostFragment_to_feedFragment"
+            app:destination="@id/feedFragment">
+        </action>
+        <action
+            android:id="@+id/action_readPostFragment_to_EditPostFragment"
+            app:destination="@id/editPostFragment">
+        </action>
+        <argument
+            android:name="postText"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
 </navigation>

@@ -14,20 +14,7 @@ import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.service.DateTimeService
 import ru.netology.nmedia.service.PostService
-
-
-typealias OnLikeListener = (Post) -> Unit
-typealias OnRepostListener = (Post) -> Unit
-typealias OnRemoveById = (Post) -> Unit
-
-// Интерфейс PostListener содержит все методы, которые позволяют манипулировать постом в ленте
-interface PostListener {
-    fun onEdit(post: Post)
-    fun onRemove(post: Post)
-    fun onLike(post: Post)
-    fun onRepost(post: Post)
-    fun onPlayVideo(post: Post)
-}
+import ru.netology.nmedia.interfaces.PostListener
 
 @RequiresApi(Build.VERSION_CODES.O)
 class PostsAdapter(
@@ -78,6 +65,10 @@ class PostViewHolder(
             shares.text = PostService.convertNumberIntoText(post.repostsCount)
             comments.text = PostService.convertNumberIntoText(post.commentsCount)
             views.text = PostService.convertNumberIntoText(post.viewsCount)
+
+            content.setOnClickListener {
+                listener.onViewPost(post)
+            }
 
             likes.setOnClickListener {
                 listener.onLike(post)

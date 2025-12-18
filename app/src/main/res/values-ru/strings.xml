@@ -20,4 +20,6 @@
     <string name="edited_post_title">Редактирование поста</string>
     <string name="play">Смотреть</string>
     <string name="invalid_link">Невозможно открыть ссылку</string>
+    <string name="save_post">Сохранить</string>
+    <string name="cancel_button">Отмена</string>
 </resources>

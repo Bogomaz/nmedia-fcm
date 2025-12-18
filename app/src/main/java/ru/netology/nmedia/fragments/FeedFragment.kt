@@ -1,37 +1,67 @@
 package ru.netology.nmedia.fragments
 
 import android.content.Intent
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
-import ru.netology.nmedia.adapter.PostListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
+import androidx.core.net.toUri
+import androidx.fragment.app.activityViewModels
+import ru.netology.nmedia.interfaces.PostListener
+
 
 class FeedFragment : Fragment() {
+
+    private var _binding: FragmentFeedBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: PostViewModel by activityViewModels()
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentFeedBinding.inflate(layoutInflater, container, false)
-        val viewModel: PostViewModel by viewModels (ownerProducer = ::requireParentFragment)
+        _binding = FragmentFeedBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        //Создаём адаптер, передаём ему объект PostListener
-        //Переопределяем все методы  так, чтобы в них вызывались функции их вьюшки
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val adapter = PostsAdapter(object : PostListener {
+
+            // Этот метод передаёт данные через bundle
+            override fun onViewPost(post: Post) {
+                val bundle = Bundle().apply {
+                    putParcelable("post", post) // ← ключ "post", сам объект!
+                }
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_readPostFragment,
+                    bundle
+                )
+            }
+
+
+            // Этот метод передаёт данные на форму редактирования через safe args
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
+                val action = FeedFragmentDirections
+                    .actionFeedFragmentToEditPostFragment()
+                    .setPostText(post.text)
+                findNavController().navigate(action)
             }
 
             override fun onRemove(post: Post) {
@@ -39,7 +69,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onPlayVideo(post: Post) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.videoLink))
+                val intent = Intent(Intent.ACTION_VIEW, post.videoLink.toUri())
                 try {
                     startActivity(intent)
                 } catch (e: Exception) {
@@ -93,13 +123,16 @@ class FeedFragment : Fragment() {
             adapter.submitList(posts)
         }
 
-        //Обработчик кнопки Сохранить
+        //Обработчик кнопки "Создать пост"
         binding.addNewPost.setOnClickListener()
         {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            val action = FeedFragmentDirections.actionFeedFragmentToEditPostFragment()
+            findNavController().navigate(action)
         }
-        return binding.root
     }
-    val viewModel: PostViewModel by viewModels()
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }

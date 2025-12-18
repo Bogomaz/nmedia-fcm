@@ -16,5 +16,7 @@
     <dimen name="edit_title_size">14sp</dimen>
     <dimen name="edited_post_title_size">16sp</dimen>
     <dimen name="rounded_angle">8dp</dimen>
+    <dimen name="post_header">88dp</dimen>
+    <dimen name="post_header_top_margin">128dp</dimen>
 
 </resources>
