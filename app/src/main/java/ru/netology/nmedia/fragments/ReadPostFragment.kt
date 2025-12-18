@@ -3,6 +3,7 @@
 package ru.netology.nmedia.fragments
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentReadPostBinding
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.service.DateTimeService
+import ru.netology.nmedia.service.DateTimeService.formatUnixTime
 import ru.netology.nmedia.service.PostService
 import ru.netology.nmedia.utils.openVideo
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -120,7 +122,13 @@ class ReadPostFragment() : Fragment() {
             binding.apply {
                 author.text = post.author
                 avatar.setImageResource(R.drawable.avatar)
-                published.text = DateTimeService.formatUnixTime(post.date)
+
+                published.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    formatUnixTime(post.date)
+                } else {
+                    post.date.toString()
+                }
+
                 content.text = post.text
                 if (post.videoLink.isNotEmpty()) {
                     video.visibility = View.VISIBLE

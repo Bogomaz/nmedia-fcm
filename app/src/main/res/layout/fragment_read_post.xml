@@ -200,7 +200,11 @@
                     android:layout_height="wrap_content"
                     android:checkable="true"
                     android:contentDescription="@string/likes_count"
-                    app:icon="@drawable/ic_like_selector" />
+                    app:icon="@drawable/ic_like_selector"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/shares"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/shares"
@@ -208,7 +212,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/likes_count"
-                    app:icon="@drawable/share_24" />
+                    app:icon="@drawable/share_24"
+                    app:layout_constraintStart_toEndOf="@id/likes"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/comments"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/comments"
@@ -217,7 +225,11 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/likes_count"
                     android:enabled="false"
-                    app:icon="@drawable/comment_outline" />
+                    app:icon="@drawable/comment_outline"
+                    app:layout_constraintStart_toEndOf="@id/shares"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/comments"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/views"
@@ -226,7 +238,11 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/views_count"
                     android:enabled="false"
-                    app:icon="@drawable/ic_eye" />
+                    app:icon="@drawable/ic_eye"
+                    app:layout_constraintStart_toEndOf="@id/comments"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
 
                 <androidx.constraintlayout.helper.widget.Flow
                     android:id="@+id/flow"
@@ -235,9 +251,10 @@
                     app:constraint_referenced_ids="likes, shares, comments, views"
                     app:flow_horizontalGap="@dimen/mini_spacing"
                     app:flow_wrapMode="none"
-                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
