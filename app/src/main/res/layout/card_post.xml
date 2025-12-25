@@ -201,7 +201,7 @@
         app:layout_constraintTop_toBottomOf="@id/content_bottom_br" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/shares"
+        android:id="@+id/repost"
         style="@style/Widget.Material3.Button.TextButton.Icon"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -233,7 +233,7 @@
         android:id="@+id/flow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="likes, shares, comments, views"
+        app:constraint_referenced_ids="likes, repost, comments, views"
         app:flow_horizontalGap="@dimen/mini_spacing"
         app:flow_wrapMode="none"
         app:layout_constraintEnd_toEndOf="parent"

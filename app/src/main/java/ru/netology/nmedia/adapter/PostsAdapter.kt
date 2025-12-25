@@ -62,7 +62,7 @@ class PostViewHolder(
 
             likes.isChecked = post.isLiked
             likes.text = PostService.convertNumberIntoText(post.likesCount)
-            shares.text = PostService.convertNumberIntoText(post.repostsCount)
+            repost.text = PostService.convertNumberIntoText(post.repostsCount)
             comments.text = PostService.convertNumberIntoText(post.commentsCount)
             views.text = PostService.convertNumberIntoText(post.viewsCount)
 
@@ -74,7 +74,7 @@ class PostViewHolder(
                 listener.onLike(post)
             }
 
-            shares.setOnClickListener {
+            repost.setOnClickListener {
                 listener.onRepost(post)
             }
 

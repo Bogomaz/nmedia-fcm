@@ -2,28 +2,24 @@
 
 package ru.netology.nmedia.fragments
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentReadPostBinding
 import ru.netology.nmedia.model.EditMode
 import ru.netology.nmedia.model.Post
-import ru.netology.nmedia.service.DateTimeService
 import ru.netology.nmedia.service.DateTimeService.formatUnixTime
 import ru.netology.nmedia.service.PostService
 import ru.netology.nmedia.utils.editMode
 import ru.netology.nmedia.utils.openVideo
 import ru.netology.nmedia.viewmodel.PostViewModel
 import kotlin.getValue
-import ru.netology.nmedia.utils.postText
 import ru.netology.nmedia.utils.postId
 
 class ReadPostFragment() : Fragment() {
@@ -90,7 +86,7 @@ class ReadPostFragment() : Fragment() {
                 viewModel.likeById(postId)
             }
 
-            shares.setOnClickListener {
+            repost.setOnClickListener {
                 findNavController().navigate(
                     R.id.action_readPostFragment_to_EditPostFragment,
                     Bundle().apply {
@@ -149,7 +145,7 @@ class ReadPostFragment() : Fragment() {
                 }
                 likes.isChecked = post.isLiked
                 likes.text = PostService.convertNumberIntoText(post.likesCount)
-                shares.text = PostService.convertNumberIntoText(post.repostsCount)
+                repost.text = PostService.convertNumberIntoText(post.repostsCount)
                 comments.text = PostService.convertNumberIntoText(post.commentsCount)
                 views.text = PostService.convertNumberIntoText(post.viewsCount)
             }

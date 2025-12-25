@@ -12,8 +12,11 @@ import ru.netology.nmedia.databinding.FragmentEditPostBinding
 import ru.netology.nmedia.model.EditMode
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.utils.AndroidUtils
+import ru.netology.nmedia.utils.clearDraft
 import ru.netology.nmedia.utils.editMode
+import ru.netology.nmedia.utils.getDraft
 import ru.netology.nmedia.utils.postId
+import ru.netology.nmedia.utils.saveDraft
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class EditPostFragment : Fragment() {
@@ -43,6 +46,14 @@ class EditPostFragment : Fragment() {
             when (editMode) {
                 EditMode.CREATE -> {
                     topAppBar.title = getString(R.string.created_post_title)
+
+                    // Загрузить черновик, если он есть
+                    val draft = requireContext().getDraft()
+                    if (!draft.isNullOrEmpty()) {
+                        newText.setText(draft)
+                        //Поставить курсор в конец
+                        newText.setSelection(draft.length)
+                    }
                 }
 
                 EditMode.EDIT, EditMode.REPOST -> {
@@ -52,8 +63,8 @@ class EditPostFragment : Fragment() {
                         newText.setText(post.text)
                         when (editMode) {
                             EditMode.EDIT -> topAppBar.title = getString(R.string.edited_post_title)
-
-                            EditMode.REPOST -> topAppBar.title = getString(R.string.reposted_post_title)
+                            EditMode.REPOST -> topAppBar.title =
+                                getString(R.string.reposted_post_title)
                         }
                     }
                 }
@@ -69,20 +80,25 @@ class EditPostFragment : Fragment() {
             when (editMode) {
                 EditMode.CREATE, EditMode.EDIT -> {
                     viewModel.save(text)
+                    // Очистить черновик после сохранения.
+                    requireContext().clearDraft()
+                    findNavController().popBackStack()
                 }
 
                 EditMode.REPOST -> {
                     currentPost?.let { post ->
                         viewModel.repost(parentId = post.id, text = text)
+                        findNavController().popBackStack(R.id.feedFragment, false)
                     }
                 }
             }
-
-            findNavController().navigateUp()
         }
 
         binding.cancelEdit.setOnClickListener {
-            findNavController().navigateUp()
+            if (editMode == EditMode.CREATE) {
+                requireContext().saveDraft(binding.newText.text.toString())
+            }
+            findNavController().popBackStack()
         }
     }
 

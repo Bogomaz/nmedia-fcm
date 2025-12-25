@@ -20,7 +20,6 @@ import ru.netology.nmedia.model.EditMode
 import ru.netology.nmedia.utils.editMode
 import ru.netology.nmedia.utils.openVideo
 
-import ru.netology.nmedia.utils.postText
 import ru.netology.nmedia.utils.postId
 
 
@@ -49,7 +48,6 @@ class FeedFragment : Fragment() {
 
             // Этот метод передаёт данные через bundle с помощью делегата
             override fun onViewPost(post: Post) {
-                //val bundle = Bundle().apply { post = selectedPost }
                 val bundle = Bundle().apply { postId = post.id }
 
                 findNavController().navigate(

@@ -204,10 +204,10 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/shares"/>
+                    app:layout_constraintEnd_toStartOf="@id/repost"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/shares"
+                    android:id="@+id/repost"
                     style="@style/Widget.Material3.Button.TextButton.Icon"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -226,7 +226,7 @@
                     android:contentDescription="@string/likes_count"
                     android:enabled="false"
                     app:icon="@drawable/comment_outline"
-                    app:layout_constraintStart_toEndOf="@id/shares"
+                    app:layout_constraintStart_toEndOf="@id/repost"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/comments"/>
@@ -248,7 +248,7 @@
                     android:id="@+id/flow"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="likes, shares, comments, views"
+                    app:constraint_referenced_ids="likes, repost, comments, views"
                     app:flow_horizontalGap="@dimen/mini_spacing"
                     app:flow_wrapMode="none"
                     app:layout_constraintStart_toStartOf="parent"
