@@ -1,0 +1,114 @@
+#------- SERVER: Server projects
+
+server/fcm.json
+server/constants.kt
+server/.gradle
+server/build/
+server/!gradle/wrapper/gradle-wrapper.jar
+server/!**/src/main/**/build/
+server/!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+server/.idea/modules.xml
+server/.idea/jarRepositories.xml
+server/.idea/compiler.xml
+server/.idea/libraries/
+server/*.iws
+server/*.iml
+server/*.ipr
+server/out/
+server/!**/src/main/**/out/
+server/!**/src/test/**/out/
+
+### Kotlin ###
+server/.kotlin
+
+### Eclipse ###
+server/.apt_generated
+server/.classpath
+server/.factorypath
+server/.project
+server/.settings
+server/.springBeans
+server/.sts4-cache
+server/bin/
+server/!**/src/main/**/bin/
+server/!**/src/test/**/bin/
+
+### NetBeans ###
+server/nbproject/private/
+server/nbbuild/
+server/dist/
+server/nbdist/
+server/.nb-gradle/
+
+### VS Code ###
+server/.vscode/
+
+### Mac OS ###
+server/.DS_Store
+
+
+#-------- CLIENT: Android client project
+/android-app/reserve.md
+/android-app/HELP.md
+/android-app/.gradle
+/android-app/build/
+
+### STS ###
+/android-app/.apt_generated
+/android-app/.classpath
+/android-app/.factorypath
+/android-app/.project
+/android-app/.settings
+/android-app/.springBeans
+/android-app/.sts4-cache
+
+### IntelliJ IDEA ###
+/android-app/.idea
+/android-app/*.iws
+/android-app/*.iml
+/android-app/*.ipr
+/android-app/out/
+
+### Android Studio ###
+/android-app/local.properties
+/android-app/captures/
+/android-app/.externalNativeBuild
+/android-app/.cxx
+
+### NetBeans ###
+/android-app/nbproject/private/
+/android-app/nbbuild/
+/android-app/dist/
+/android-app/nbdist/
+/android-app/.nb-gradle/
+
+### VS Code ###
+/android-app/.vscode/
+
+### Package Files ###
+/android-app/*.jar
+/android-app/*.war
+/android-app/*.nar
+/android-app/*.ear
+/android-app/*.zip
+/android-app/*.tar.gz
+/android-app/*.rar
+
+### Gradle ###
+/android-app/!gradle/wrapper/gradle-wrapper.jar
+
+### Default ###
+/android-app/local.properties
+/android-app/.idea/caches
+/android-app/.idea/libraries
+/android-app/.idea/modules.xml
+/android-app/.idea/workspace.xml
+/android-app/.idea/navEditor.xml
+/android-app/.idea/assetWizardSettings.xml
+/android-app/.DS_Store
+/android-app/build
+/android-app/captures
+
+/android-app/google-services.json
