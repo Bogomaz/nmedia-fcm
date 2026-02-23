@@ -28,5 +28,8 @@
     <string name="channel_remote_name">Server notifications</string>
     <string name="channel_remote_description">Notifications from remote server</string>
 
+    <string name="notification_user_new_post">%1$s create new post</string>
+    <string name="notification_post_by">Author: %1$s</string>
+
 
 </resources>

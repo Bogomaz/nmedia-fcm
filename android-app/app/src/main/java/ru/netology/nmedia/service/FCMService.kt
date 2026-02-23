@@ -38,11 +38,35 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        message.data[action]?.let {
-            when (Action.valueOf(it)) {
-                Action.LIKE -> handleLike(gson.fromJson(message.data[content], Like::class.java))
+        val actionString = message.data[action]
+        val action = actionString?.toAction() ?: Action.UNKNOWN
+
+        when (action) {
+            Action.LIKE -> {
+                val likeJson = message.data[content]  // content = "content"
+                if (likeJson == null) {
+                    Log.w("FCM", "LIKE action without content")
+                    return
+                }
+                val like = gson.fromJson(likeJson, Like::class.java)
+                handleLike(like)
+            }
+
+            Action.NEW_POST -> {
+                val newPostJson = message.data[content]
+                if (newPostJson == null) {
+                    Log.w("FCM", "NEW_POST action without content")
+                    return
+                }
+                val newPost = gson.fromJson(newPostJson, NewPost::class.java)
+                handleNewPost(newPost)
+            }
+
+            Action.UNKNOWN -> {
+                Log.w("FCM", "Unknown action in notificcation: $actionString")
             }
         }
+
         Log.d("FCM", "message: ${Gson().toJson(message)}")
     }
 
@@ -50,6 +74,7 @@ class FCMService : FirebaseMessagingService() {
         println(token)
     }
 
+    // Обработка контента сообщения о новом лайке.
     private fun handleLike(content: Like) {
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
@@ -66,6 +91,35 @@ class FCMService : FirebaseMessagingService() {
         notify(notification)
     }
 
+    // Обработка контента сообщения о новом посте.
+    private fun handleNewPost(content: NewPost) {
+        val shortText = content.postTitle
+
+        val longText = buildString {
+            appendLine(content.postTitle)
+            appendLine()
+            appendLine(content.postContent)
+        }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(
+                getString(
+                    R.string.notification_user_new_post,
+                    content.userName
+                )
+            )
+            .setContentText(shortText) // в свёрнутом виде
+            .setStyle(
+                NotificationCompat.BigTextStyle()  // стиль «разворачиваемого» уведомления
+                    .bigText(longText)
+            )
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+        notify(notification)
+    }
+
+    // Вывод уведомления
     private fun notify(notification: Notification) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
@@ -75,13 +129,34 @@ class FCMService : FirebaseMessagingService() {
     }
 }
 
+// Список типов экшенов, которые могут приходить от сервера
 enum class Action {
     LIKE,
+    NEW_POST,
+    UNKNOWN;
 }
+
+// Сравнение входящего экшена со списком валидных.
+// Преобразование неизвестных типов к типу UNKNOWN
+fun String.toAction(): Action =
+    try {
+        Action.valueOf(this)
+    } catch (_: IllegalArgumentException) {
+        Action.UNKNOWN
+    }
 
 data class Like(
     val userId: Long,
     val userName: String,
     val postId: Long,
     val postAuthor: String,
+)
+
+data class NewPost(
+    val userId: Long,
+    val userName: String,
+    val postId: Long,
+    val postAuthor: String,
+    val postTitle: String,
+    val postContent: String,
 )
