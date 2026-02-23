@@ -1,3 +1,3 @@
-package ru.netology.pusher
+package ru.netology.nmedia_server
 
     const val token = "dnGzR95yRKGk82Rn3qTjRe:APA91bFzIgM29FXdOXjA8fFrCdVCwxH7ksr6vfLZ6-C6xsmQ_bcXxWndcTnBiHD7Boa6WAui2fk5dsnPg90m9HlyN1azlV6x1UlJ04yAAsPbvC5XLeWwxd8"

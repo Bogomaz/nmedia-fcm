@@ -21,7 +21,7 @@ import ru.netology.nmedia.utils.postId
 
 class ReadPostFragment() : Fragment() {
 
-    private var postId: Int = 0
+    private var postId: Long = 0
     private var currentPost: Post? = null
     private var _binding: FragmentReadPostBinding? = null
     private val binding get() = _binding!!
@@ -126,7 +126,7 @@ class ReadPostFragment() : Fragment() {
             binding.apply {
                 author.text = post.author
                 avatar.setImageResource(R.drawable.avatar)
-                published.text = formatUnixTime(post.date)
+                published.text = formatUnixTime(post.publishedDate)
 
                 content.text = post.text
                 if (post.videoLink.isNotEmpty()) {

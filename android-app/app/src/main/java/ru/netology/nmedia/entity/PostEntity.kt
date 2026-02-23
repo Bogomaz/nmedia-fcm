@@ -7,9 +7,9 @@ import ru.netology.nmedia.model.Post
 @Entity
 data class PostEntity (
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val parentId: Int? = null,
-    val date: Int = 0,
+    val id: Long = 0L,
+    val parentId: Long? = null,
+    val publishedDate: Long,
     val author: String = "",
     val text: String = "",
     val videoLink: String = "",
@@ -24,7 +24,7 @@ data class PostEntity (
     fun toDto() = Post(
         id,
         parentId,
-        date,
+        publishedDate,
         author,
         text,
         videoLink,
@@ -41,7 +41,7 @@ data class PostEntity (
         fun fromDto(post: Post) = PostEntity(
             post.id,
             post.parentId,
-            post.date,
+            post.publishedDate,
             post.author,
             post.text,
             post.videoLink,

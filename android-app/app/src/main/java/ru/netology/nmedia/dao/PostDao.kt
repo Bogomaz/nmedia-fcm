@@ -12,15 +12,15 @@ interface PostDao {
     fun getAll(): LiveData<List<PostEntity>>
 
     @Query("SELECT * FROM PostEntity WHERE id = :id")
-    fun getById(id: Int): PostEntity?
+    fun getById(id: Long): PostEntity?
 
     @Insert
     fun insert(post: PostEntity)
 
     @Query("UPDATE PostEntity SET text = :text WHERE id = :id")
-    fun updateContentById(id: Int, text: String)
+    fun updateContentById(id: Long, text: String)
     fun save(post: PostEntity) =
-        if (post.id == 0) insert(post) else updateContentById(post.id, post.text)
+        if (post.id == 0L) insert(post) else updateContentById(post.id, post.text)
 
     @Query(
         """
@@ -30,10 +30,10 @@ interface PostDao {
                WHERE id = :id;
         """
     )
-    fun likeById(id: Int)
+    fun likeById(id: Long)
 
     @Query("DELETE FROM PostEntity WHERE id = :id")
-    fun removeById(id: Int)
+    fun removeById(id: Long)
 
     @Query(
         """
@@ -42,4 +42,4 @@ interface PostDao {
         WHERE id = :id
         """
     )
-    fun incrementRepostsCount(id: Int)}
+    fun incrementRepostsCount(id: Long)}

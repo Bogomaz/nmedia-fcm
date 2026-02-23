@@ -16,15 +16,15 @@ class PostRepositoryRoomImpl(
 
     override fun save(post: Post) = dao.save(PostEntity.fromDto(post))
 
-    override fun likeById(id: Int) = dao.likeById(id)
+    override fun likeById(id: Long) = dao.likeById(id)
 
-    override fun repost(parentId: Int, text: String) {
+    override fun repost(parentId: Long, text: String) {
         val parent = dao.getById(parentId) ?: return
         val repostEntity = parent.copy(
             id = 0,
             parentId = parentId,
             text = text.ifBlank { parent.text },
-            date = (System.currentTimeMillis() / 1000).toInt(),
+            publishedDate = (System.currentTimeMillis() / 1000),
             likesCount = 0,
             isLiked = false,
             commentsCount = 0,
@@ -36,5 +36,5 @@ class PostRepositoryRoomImpl(
 
         dao.incrementRepostsCount(parentId)
     }
-    override fun removeById(id: Int) = dao.removeById(id)
+    override fun removeById(id: Long) = dao.removeById(id)
 }

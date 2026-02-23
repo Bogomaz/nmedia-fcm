@@ -1,4 +1,4 @@
-package ru.netology.pusher
+package ru.netology.nmedia_server
 
 import com.google.firebase.messaging.Message
 import com.google.gson.Gson

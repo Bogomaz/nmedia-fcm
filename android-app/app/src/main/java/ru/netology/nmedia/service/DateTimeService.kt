@@ -7,7 +7,7 @@ import java.util.Locale
 
 object DateTimeService {
     // Конвертирует и форматирует UnixTime в строку с датой и временем публикации
-    fun formatUnixTime(unixDateTime: Int): String {
+    fun formatUnixTime(unixDateTime: Long): String {
         val instant = Instant.ofEpochSecond(unixDateTime.toLong())
         val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy 'в' HH:mm", Locale("ru"))
             .withZone(ZoneId.systemDefault())

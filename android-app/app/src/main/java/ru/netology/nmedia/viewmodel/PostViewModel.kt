@@ -9,7 +9,7 @@ import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryRoomImpl
 
 private val emptyPost = Post(
-    date = (System.currentTimeMillis() / 1000).toInt(),
+    publishedDate = (System.currentTimeMillis() / 1000),
     author = "Студент Нетологии",
     text = "",
     commentsCount = 0,
@@ -25,11 +25,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     val data = repository.getAll()
     val edited = MutableLiveData(emptyPost)
-    fun likeById(id: Int) {
+    fun likeById(id: Long) {
         repository.likeById(id)
     }
 
-    fun repost(parentId: Int, text: String) {
+    fun repost(parentId: Long, text: String) {
         repository.repost(parentId, text)
     }
 
@@ -49,7 +49,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value = post
     }
 
-    fun removeById(id: Int) {
+    fun removeById(id: Long) {
         repository.removeById(id)
     }
 }
