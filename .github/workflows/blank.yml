@@ -31,6 +31,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
+
+      # Runs a command for decode secret google-services
+      - name: Decode google-services.json
+        env:
+          FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+        run: echo $FIREBASE_SECRET > ./app/google-services.json
         
       # Runs a set of commands using the runners shell
       - name: Build
