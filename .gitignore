@@ -111,4 +111,4 @@ server/.DS_Store
 /android-app/build
 /android-app/captures
 
-/android-app/google-services.json
+/android-app/app/google-services.json
