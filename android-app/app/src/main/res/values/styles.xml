@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.AppTheme.PostButton" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="iconTint">@color/skh_likes_color_selector</item>
+        <item name="android:minWidth">@dimen/icon_size</item>
+        <item name="android:minHeight">@dimen/icon_size</item>
+    </style>
+</resources>

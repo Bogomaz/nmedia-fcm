@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Nmedia</string>
+    <string name="main_text">NMedia!</string>
+    <string name="author_short">Netology!</string>
+    <string name="description_post_author_avatar_menu">Post author avatar</string>
+    <string name="description_post_menu">Post menu</string>
+    <string name="content">Content</string>
+    <string name="likes_count">It liked</string>
+    <string name="comments_count">It commented</string>
+    <string name="shares_count">It shared</string>
+    <string name="views_count">It viewed</string>
+    <string name="edit">Edit</string>>
+    <string name="remove">Remove</string>
+    <string name="new_post_text">Enter a post text</string>
+    <string name="add_new_post">Add a new post</string>
+    <string name="empty_post_text">The post text is empty</string>
+    <string name="blank_text_error">Text is blank</string>
+    <string name="created_post_title">Create post</string>
+    <string name="reposted_post_title">Repost</string>
+    <string name="edited_post_title">Edit post</string>
+    <string name="reading_post_title">Reading post</string>
+
+    <string name="play">Play</string>
+    <string name="invalid_link">Unable to open link</string>
+    <string name="save_post">Save</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="notification_user_liked">You get new like!</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
+
+
+</resources>

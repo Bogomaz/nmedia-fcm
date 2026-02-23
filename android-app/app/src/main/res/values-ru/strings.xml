@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">НМедиа</string>
+    <string name="main_text">НМедиа!</string>
+    <string name="author_short">Нетология!</string>
+    <string name="description_post_author_avatar_menu">Аватар автора поста</string>
+    <string name="description_post_menu">Меню поста</string>
+    <string name="content">Контент</string>
+    <string name="likes_count">Это понравилось"</string>
+    <string name="shares_count">Этим поделились"</string>
+    <string name="comments_count">Это прокомментировали</string>
+    <string name="views_count">Это посмотрели</string>
+    <string name="edit">Редактировать</string>>
+    <string name="remove">Удалить</string>
+    <string name="new_post_text">Введите текст поста</string>
+    <string name="add_new_post">Создать новый пост</string>
+    <string name="empty_post_text">Пост не может быть пустым</string>
+    <string name="blank_text_error">Текст отсутствует!</string>
+    <string name="created_post_title">Создание поста</string>
+    <string name="reposted_post_title">Репост</string>
+    <string name="edited_post_title">Редактирование поста</string>
+    <string name="reading_post_title">Просмотр поста</string>
+    <string name="play">Смотреть</string>
+    <string name="invalid_link">Невозможно перейти по ссылке</string>
+    <string name="save_post">Сохранить</string>
+    <string name="cancel_button">Отмена</string>
+    <string name="notification_user_liked">Вам поставили лайк!</string>
+    <string name="channel_remote_name">Серверное уведомление</string>
+    <string name="channel_remote_description">Уведомление от сервера.</string>
+</resources>
