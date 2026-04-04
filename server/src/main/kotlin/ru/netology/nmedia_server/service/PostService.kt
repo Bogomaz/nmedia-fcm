@@ -27,14 +27,14 @@ class PostService(private val repository: PostRepository) {
         .orElse(
             PostEntity.fromDto(
                 dto.copy(
-                    likesCount = 0,
-                    isLiked = false,
-                    publishedDate = OffsetDateTime.now().toEpochSecond()
+//                    likes = 0,
+//                    likedByMe = false,
+                    published = OffsetDateTime.now().toEpochSecond()
                 )
             )
         )
         .let {
-            if (it.id == 0L) repository.save(it) else it.content = dto.text
+            if (it.id == 0L) repository.save(it) else it.content = dto.content
             it
         }.toDto()
 
@@ -47,8 +47,8 @@ class PostService(private val repository: PostRepository) {
         .findById(id)
         .orElseThrow(::NotFoundException)
         .apply {
-            likesCount += 1
-            isLiked = true
+            likes += 1
+            likedByMe = true
         }
         .toDto()
 
@@ -56,8 +56,8 @@ class PostService(private val repository: PostRepository) {
         .findById(id)
         .orElseThrow(::NotFoundException)
         .apply {
-            likesCount -= 1
-            isLiked = false
+            likes -= 1
+            likedByMe = false
         }
         .toDto()
 }

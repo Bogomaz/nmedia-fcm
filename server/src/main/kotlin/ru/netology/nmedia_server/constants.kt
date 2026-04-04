@@ -1,3 +1,3 @@
 package ru.netology.nmedia_server
 
-    const val token = "dnGzR95yRKGk82Rn3qTjRe:APA91bFzIgM29FXdOXjA8fFrCdVCwxH7ksr6vfLZ6-C6xsmQ_bcXxWndcTnBiHD7Boa6WAui2fk5dsnPg90m9HlyN1azlV6x1UlJ04yAAsPbvC5XLeWwxd8"
+    const val token = "cAZQ0udyRTSzYKIHg-iUfB:APA91bFPePoSaMrGajm7SJEv74g7XEaKq24XOecinJB_QFOHlpXuQPuTt1nKw9paOm5dhezndhNj2N6p1ZRGFxob02J1aWfoyszaOm6OXOmJziOIzusV9W4"
