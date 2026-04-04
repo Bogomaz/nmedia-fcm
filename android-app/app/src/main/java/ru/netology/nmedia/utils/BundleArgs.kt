@@ -10,6 +10,7 @@ var Bundle.postText by BundleStringArg(BundleKeys.ARG_POST_TEXT)
 var Bundle.postId by BundleLongArg(BundleKeys.ARG_POST_ID)
 
 var Bundle.editMode by BundleStringArg(BundleKeys.ARG_EDIT_TYPE)
+
 // Объект для хранения ключей. На случай, если придётся передавать что-то ещё кроме текста поста.
 object BundleKeys {
     const val ARG_POST_TEXT = "postText" // для хранения текста поста
@@ -39,6 +40,7 @@ class BundleStringArg(private val key: String) : ReadWriteProperty<Bundle, Strin
         }
     }
 }
+
 /**
  * Получение / запись объекта */
 class BundlePostArgs(private val key: String) : ReadWriteProperty<Bundle, Parcelable?> {
@@ -62,34 +64,40 @@ class BundlePostArgs(private val key: String) : ReadWriteProperty<Bundle, Parcel
 
 /**
  * Получение / запись числа */
-//class BundleLongArg(private val key: String) : ReadWriteProperty<Bundle, Long?> {
-//    override fun getValue(
-//        thisRef: Bundle,
-//        property: KProperty<*>
-//    ): Long = thisRef.getLong(key)
-//
-//    override fun setValue(
-//        thisRef: Bundle,
-//        property: KProperty<*>,
-//        value: Long?
-//    ) {
-//        if (value != null) {
-//            thisRef.putLong(key, value)
-//        } else {
-//            thisRef.remove(key)
-//        }
-//    }
-//}
+class BundleIntArg(private val key: String) : ReadWriteProperty<Bundle, Int?> {
+    override fun getValue(
+        thisRef: Bundle,
+        property: KProperty<*>
+    ): Int = thisRef.getInt(key)
 
-class BundleLongArg(
-    private val key: String,
-    private val defaultValue: Long = 0L
-) : ReadWriteProperty<Bundle, Long> {
+    override fun setValue(
+        thisRef: Bundle,
+        property: KProperty<*>,
+        value: Int?
+    ) {
+        if (value != null) {
+            thisRef.putInt(key, value)
+        } else {
+            thisRef.remove(key)
+        }
+    }
+}
 
-    override fun getValue(thisRef: Bundle, property: KProperty<*>): Long =
-        thisRef.getLong(key, defaultValue)
+class BundleLongArg(private val key: String) : ReadWriteProperty<Bundle, Long?> {
+    override fun getValue(
+        thisRef: Bundle,
+        property: KProperty<*>
+    ): Long = thisRef.getLong(key)
 
-    override fun setValue(thisRef: Bundle, property: KProperty<*>, value: Long) {
-        thisRef.putLong(key, value)
+    override fun setValue(
+        thisRef: Bundle,
+        property: KProperty<*>,
+        value: Long?
+    ) {
+        if (value != null) {
+            thisRef.putLong(key, value)
+        } else {
+            thisRef.remove(key)
+        }
     }
 }

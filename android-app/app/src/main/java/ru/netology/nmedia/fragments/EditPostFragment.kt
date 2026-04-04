@@ -58,7 +58,7 @@ class EditPostFragment : Fragment() {
 
                 EditMode.EDIT, EditMode.REPOST -> {
                     viewModel.data.observe(viewLifecycleOwner) { posts ->
-                        val post = posts.find { it.id == postId } ?: return@observe
+                        val post = posts.find { it.id == postId.toLong() } ?: return@observe
                         currentPost = post
                         newText.setText(post.text)
                         when (editMode) {

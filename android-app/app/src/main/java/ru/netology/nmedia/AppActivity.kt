@@ -85,7 +85,7 @@ class AppActivity : AppCompatActivity() {
         }
 
         FirebaseMessaging.getInstance().token.addOnSuccessListener {
-            println(it)
+            println("TOKEN: $it")
         }
     }
 }

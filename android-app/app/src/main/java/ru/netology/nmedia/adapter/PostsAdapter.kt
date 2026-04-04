@@ -46,7 +46,7 @@ class PostViewHolder(
         binding.apply {
             author.text = post.author
             avatar.setImageResource(R.drawable.avatar)
-            published.text = DateTimeService.formatUnixTime(post.publishedDate)
+            published.text = DateTimeService.formatUnixTime(post.date)
             content.text = post.text
             if (post.videoLink != "") {
                 video.visibility = View.VISIBLE
