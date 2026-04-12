@@ -30,10 +30,6 @@
 
     <string name="notification_user_new_post">%1$s create new post</string>
     <string name="notification_post_by">Author: %1$s</string>
-    <string name="no_posts">No posts</string>
-    <string name="network_error">Network error</string>
-    <string name="retry">Retry</string>
-
 
 
 </resources>

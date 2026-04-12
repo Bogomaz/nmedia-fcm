@@ -91,22 +91,6 @@ class FeedFragment : Fragment() {
         })
         binding.postList.adapter = adapter // созданный адаптер помещаем в Recycler View с постами
 
-        // Крутилка обновления
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refresh()
-        }
-
-        // Подписаться на данные из Room
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            adapter.submitList(posts)
-            // Когда получили новые данные – убираем крутилку
-            binding.swipeRefresh.isRefreshing = false
-        }
-
-        // Получить посты с сервера.
-        viewModel.refresh()
-
-
         // Переводит ленту вверх, чтобы пользователь сразу
         // видел добавленный пост
         adapter.registerAdapterDataObserver(

@@ -1,19 +1,15 @@
 package ru.netology.nmedia.viewmodel
 
 import android.app.Application
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import ru.netology.nmedia.api.Api
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.model.Post
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryImpl
+import ru.netology.nmedia.repository.PostRepositoryRoomImpl
 
 private val emptyPost = Post(
-    date = (System.currentTimeMillis() / 1000),
+    publishedDate = (System.currentTimeMillis() / 1000),
     author = "Студент Нетологии",
     text = "",
     commentsCount = 0,
@@ -23,30 +19,21 @@ private val emptyPost = Post(
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: PostRepository = PostRepositoryImpl(
-        AppDb.getInstance(application).postDao,
-        Api.service
+    private val repository: PostRepository = PostRepositoryRoomImpl(
+        AppDb.getInstance(application).postDao
     )
 
     val data = repository.getAll()
     val edited = MutableLiveData(emptyPost)
-
-    fun refresh() = viewModelScope.launch {
-        try{
-            repository.refresh()
-        }catch(e: Exception){
-
-        }
-    }
-    fun likeById(id: Long) = viewModelScope.launch {
+    fun likeById(id: Long) {
         repository.likeById(id)
     }
 
-    fun repost(parentId: Long, text: String)  = viewModelScope.launch{
+    fun repost(parentId: Long, text: String) {
         repository.repost(parentId, text)
     }
 
-    fun save(newText: String) = viewModelScope.launch{
+    fun save(newText: String) {
         edited.value?.let { post ->
             val trimmedText = newText.trim()
             if (trimmedText != post.text) {
@@ -62,7 +49,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         edited.value = post
     }
 
-    fun removeById(id: Long) = viewModelScope.launch {
+    fun removeById(id: Long) {
         repository.removeById(id)
     }
 }

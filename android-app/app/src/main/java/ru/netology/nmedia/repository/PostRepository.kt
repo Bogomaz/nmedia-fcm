@@ -5,13 +5,12 @@ import ru.netology.nmedia.model.Post
 
 interface PostRepository  {
     fun getAll(): LiveData<List<Post>>
-    suspend fun refresh()
-    suspend fun save(post:Post)
+    fun save(post:Post)
 
-    suspend fun removeById(id: Long)
+    fun removeById(id: Long)
 
-    suspend fun likeById(id: Long)
+    fun likeById(id: Long)
 
-    suspend fun repost(parentId: Long, text: String)
+    fun repost(parentId: Long, text: String)
 
 }

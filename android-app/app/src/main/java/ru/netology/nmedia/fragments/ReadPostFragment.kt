@@ -126,7 +126,7 @@ class ReadPostFragment() : Fragment() {
             binding.apply {
                 author.text = post.author
                 avatar.setImageResource(R.drawable.avatar)
-                published.text = formatUnixTime(post.date)
+                published.text = formatUnixTime(post.publishedDate)
 
                 content.text = post.text
                 if (post.videoLink.isNotEmpty()) {
