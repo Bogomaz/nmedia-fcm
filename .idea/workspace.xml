@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8731d68-a22c-45a5-8dd7-57e7def30eda" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/NMediaApplication.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/config/TestDataInitializer.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/LikeUtils.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/PostUtils.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/config/AppWebMvcConfigurer.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/config/AppWebMvcConfigurer.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/constants.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/constants.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/controller/PostController.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/controller/PostController.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/dto/Post.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/dto/Post.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/entity/PostEntity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/entity/PostEntity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/main.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/service/PostService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/kotlin/ru/netology/nmedia_server/service/PostService.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,24 +30,16 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Study/Kotlin/nmedia-fcm"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Study\Kotlin\nmedia-fcm\android-app\app\src\main\java\ru\netology\nmedia\repository" />
-      <recent name="C:\Study\Kotlin\nmedia-fcm\android-app\app\src\main\java\ru\netology\nmedia" />
-    </key>
-  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="d8731d68-a22c-45a5-8dd7-57e7def30eda" name="Changes" comment="" />
@@ -68,16 +49,5 @@
       <updated>1771846410281</updated>
     </task>
     <servers />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>
