@@ -14,11 +14,4 @@ data class Post(
     val isLiked: Boolean = false,
     val viewsCount: Int = 0,
     val repostsCount: Int = 0,
-
-//    val id: Long,
-//    val author: String,
-//    val content: String,
-//    val published: Long,
-//    val likedByMe: Boolean,
-//    val likes: Int = 0,
 )

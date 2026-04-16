@@ -9,8 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentReadPostBinding
-import ru.netology.nmedia.model.EditMode
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.dto.EditMode
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.service.DateTimeService.formatUnixTime
 import ru.netology.nmedia.service.ConvertNumberService
 import ru.netology.nmedia.utils.editMode
@@ -120,29 +120,29 @@ class ReadPostFragment() : Fragment() {
         }
 
         // Обновление данных при изменении данных поста.
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            val post = posts.find { it.id == postId } ?: return@observe
-            currentPost = post
-            binding.apply {
-                author.text = post.author
-                avatar.setImageResource(R.drawable.avatar)
-                published.text = formatUnixTime(post.publishedDate)
-
-                content.text = post.text
-                if (post.videoLink.isNotEmpty()) {
-                    video.visibility = View.VISIBLE
-                    videoDescription.text = post.videoDescription
-                    videoDate.text = post.videoDate
-                } else {
-                    video.visibility = View.GONE
-                }
-                likes.isChecked = post.isLiked
-                likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
-                repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
-                comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
-                views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
-            }
-        }
+//        viewModel.data.observe(viewLifecycleOwner) { posts ->
+//            val post = posts.find { it.id == postId } ?: return@observe
+//            currentPost = post
+//            binding.apply {
+//                author.text = post.author
+//                avatar.setImageResource(R.drawable.avatar)
+//                published.text = formatUnixTime(post.date)
+//
+//                content.text = post.text
+//                if (post.videoLink.isNotEmpty()) {
+//                    video.visibility = View.VISIBLE
+//                    videoDescription.text = post.videoDescription
+//                    videoDate.text = post.videoDate
+//                } else {
+//                    video.visibility = View.GONE
+//                }
+//                likes.isChecked = post.isLiked
+//                likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
+//                repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
+//                comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
+//                views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+//            }
+//        }
     }
 
     override fun onDestroyView() {

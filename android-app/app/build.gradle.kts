@@ -27,7 +27,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 
@@ -36,8 +36,13 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            manifestPlaceholders["usesCleartextTraffic"] = "false"
+        }
+        debug {
+            // пример плейсхолдера для манифеста
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
     }
     compileOptions {
@@ -61,6 +66,7 @@ dependencies {
 
     implementation(libs.play.services)
     implementation(libs.converter.gson)
+    implementation(libs.okhttp)
 
     coreLibraryDesugaring(libs.desugaring)
     implementation(libs.androidx.core.ktx)

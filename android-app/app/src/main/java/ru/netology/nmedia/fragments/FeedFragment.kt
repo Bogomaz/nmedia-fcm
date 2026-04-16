@@ -4,17 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.activityViewModels
 import ru.netology.nmedia.interfaces.PostListener
-import ru.netology.nmedia.model.EditMode
+import ru.netology.nmedia.dto.EditMode
 import ru.netology.nmedia.utils.editMode
 import ru.netology.nmedia.utils.openVideo
 
@@ -38,6 +39,7 @@ class FeedFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = PostsAdapter(object : PostListener {
@@ -89,7 +91,19 @@ class FeedFragment : Fragment() {
                 )
             }
         })
+
         binding.postList.adapter = adapter // созданный адаптер помещаем в Recycler View с постами
+
+        viewModel.data.observe(viewLifecycleOwner){state ->
+            adapter.submitList(state.posts)
+            binding.progress.isVisible = state.loading
+            binding.errorGroup.isVisible = state.error
+            binding.empty.isVisible = state.empty
+        }
+
+        binding.retry.setOnClickListener {
+            viewModel.load()
+        }
 
         // Переводит ленту вверх, чтобы пользователь сразу
         // видел добавленный пост
@@ -102,11 +116,6 @@ class FeedFragment : Fragment() {
                 }
             }
         )
-
-        viewModel.data.observe(viewLifecycleOwner)
-        { posts ->
-            adapter.submitList(posts)
-        }
 
         //Обработчик кнопки "Создать пост"
         binding.addNewPost.setOnClickListener()

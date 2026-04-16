@@ -16,26 +16,4 @@ fun main(args: Array<String>) {
     runApplication<NMediaApplication>(*args)
 }
 
-//fun main() {
-//    val options = FirebaseOptions.builder()
-//        .setCredentials(GoogleCredentials.fromStream(FileInputStream("fcm.json")))
-//        .build()
-//
-//    FirebaseApp.initializeApp(options)
-//
-//    FirebaseMessaging.getInstance().send(newPostMessage)
-//
-//    // Неизвестное уведомление.
-//    val anyMessage = Message.builder()
-//        .putData("action", "HELLO")
-//        .putData(
-//            "content", """{I am a message}"""
-//        )
-//        .setToken(token)
-//        .build()
-//    FirebaseMessaging.getInstance().send(anyMessage)
-//
-//    FirebaseMessaging.getInstance().send(likeMessage)
-//}
-
 

@@ -1,6 +1,6 @@
 package ru.netology.nmedia.interfaces
 
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.dto.Post
 
 // Интерфейс PostListener содержит все методы, которые позволяют манипулировать постом в ленте
 interface PostListener {

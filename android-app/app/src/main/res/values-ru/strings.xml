@@ -20,6 +20,10 @@
     <string name="reposted_post_title">Репост</string>
     <string name="edited_post_title">Редактирование поста</string>
     <string name="reading_post_title">Просмотр поста</string>
+    <string name="empty_feed">Нет постов</string>
+    <string name="connection_error">Ошибка соединения с сервером</string>
+    <string name="load_again">Загрузить ещё раз</string>
+
     <string name="play">Смотреть</string>
     <string name="invalid_link">Невозможно перейти по ссылке</string>
     <string name="save_post">Сохранить</string>

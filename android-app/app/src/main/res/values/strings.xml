@@ -19,6 +19,10 @@
     <string name="reposted_post_title">Repost</string>
     <string name="edited_post_title">Edit post</string>
     <string name="reading_post_title">Reading post</string>
+    <string name="empty_feed">No posts</string>
+    <string name="connection_error">Server connection error</string>
+    <string name="load_again">Try again</string>
+
 
     <string name="play">Play</string>
     <string name="invalid_link">Unable to open link</string>

@@ -2,14 +2,14 @@ package ru.netology.nmedia.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.netology.nmedia.model.Post
+import ru.netology.nmedia.dto.Post
 
 @Entity
 data class PostEntity (
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
     val parentId: Long? = null,
-    val publishedDate: Long,
+    val date: Long,
     val author: String = "",
     val text: String = "",
     val videoLink: String = "",
@@ -24,7 +24,7 @@ data class PostEntity (
     fun toDto() = Post(
         id,
         parentId,
-        publishedDate,
+        date,
         author,
         text,
         videoLink,
