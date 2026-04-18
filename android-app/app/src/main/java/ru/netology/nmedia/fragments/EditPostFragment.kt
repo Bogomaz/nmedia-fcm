@@ -47,7 +47,7 @@ class EditPostFragment : Fragment() {
             when (editMode) {
                 EditMode.CREATE -> {
                     topAppBar.title = getString(R.string.created_post_title)
-                    viewModel.edit(emptyPost)
+                    //viewModel.edit(emptyPost)
 
                     // Загрузить черновик, если он есть
                     val draft = requireContext().getDraft()
@@ -88,11 +88,17 @@ class EditPostFragment : Fragment() {
                     AndroidUtils.hideKeyboard(requireView())
                     // Очистить черновик после сохранения.
                     requireContext().clearDraft()
+                    findNavController().popBackStack(R.id.feedFragment, false)
                 }
 
                 EditMode.REPOST -> {
                     currentPost?.let { post ->
-                        viewModel.repost(parentId = post.id, text = text)
+                        viewModel.edited.observe(viewLifecycleOwner){post ->
+                            currentPost = post
+                            binding.newText.setText(post.text)
+                            binding.newText.setSelection(post.text.length)
+                        }
+                        viewModel.repost(parentId = post.id, newText = text)
                         AndroidUtils.showKeyboard(binding.newText)
                         findNavController().popBackStack(R.id.feedFragment, false)
                     }

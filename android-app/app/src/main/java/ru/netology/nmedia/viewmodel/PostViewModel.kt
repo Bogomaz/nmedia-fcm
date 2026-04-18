@@ -52,30 +52,65 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        repository.likeById(id)
+        thread {
+            val currentState = _data.value ?: return@thread
+            val currentPosts = currentState.posts
+
+            val post = currentPosts.find { it.id == id } ?: return@thread
+
+            try {
+                val likedPost = if (post.isLiked) {
+                    repository.unlikeById(id)
+                } else {
+                    repository.likeById(id)
+                }
+                val newPosts = currentPosts.map {
+                    if (it.id == id) likedPost else it
+                }
+
+                _data.postValue(
+                    currentState.copy(
+                        posts = newPosts,
+                    )
+                )
+            } catch (e: Exception) {
+                _data.postValue(currentState.copy(error = true))
+            }
+        }
     }
 
-    fun repost(parentId: Long, text: String) {
-        repository.repost(parentId, text)
+    fun repost(parentId: Long, newText: String) {
+        thread {
+            val trimmedText = newText.trim()
+            if (trimmedText.isBlank()) return@thread
+
+            try {
+                repository.repost(parentId, trimmedText)
+//                val posts = repository.getAll()
+//                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+            } catch (_: Exception) {
+//                _data.postValue(FeedModel(error = true))
+            }
+        }
     }
 
     fun save(newText: String) {
         thread {
             val trimmedText = newText.trim()
-            if(trimmedText.isBlank()) return@thread
+            if (trimmedText.isBlank()) return@thread
 
             val current = edited.value ?: emptyPost
-
             val toSave = current.copy(text = trimmedText)
-            try{
+
+            try {
                 repository.save(toSave)
-                val posts = repository.getAll()
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+//                val posts = repository.getAll()
+//                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
 
                 edited.postValue(emptyPost)
                 _postCreated.postValue(Unit)
-            } catch(_:Exception){
-                _data.postValue(FeedModel(error = true))
+            } catch (_: Exception) {
+//                _data.postValue(FeedModel(error = true))
             }
         }
     }
@@ -85,12 +120,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        thread{
-            try{
+        thread {
+            try {
                 repository.removeById(id)
                 val posts = repository.getAll()
                 _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
-            }catch(e:Exception){
+            } catch (e: Exception) {
                 _data.postValue(FeedModel(error = true))
             }
         }

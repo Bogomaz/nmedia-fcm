@@ -43,21 +43,30 @@ class PostService(private val repository: PostRepository) {
             ?.also(repository::delete)
     }
 
-    fun likeById(id: Long): Post = repository
-        .findById(id)
-        .orElseThrow(::NotFoundException)
-        .apply {
-            likesCount += 1
-            isLiked = true
-        }
-        .toDto()
+    fun likeById(id: Long): Post {
+        println(">>> SERVER: likeById($id)")
+        return repository
+            .findById(id)
+            .orElseThrow(::NotFoundException)
+            .apply {
+                likesCount += 1
+                isLiked = true
+            }
+            .let(repository::save)
+            .toDto()
+    }
 
-    fun unlikeById(id: Long): Post = repository
-        .findById(id)
-        .orElseThrow(::NotFoundException)
-        .apply {
-            likesCount -= 1
-            isLiked = false
-        }
-        .toDto()
+
+    fun unlikeById(id: Long): Post {
+        println(">>> SERVER: unlikeById($id)")
+        return repository
+            .findById(id)
+            .orElseThrow(::NotFoundException)
+            .apply {
+                likesCount -= 1
+                isLiked = false
+            }
+            .let(repository::save)
+            .toDto()
+    }
 }

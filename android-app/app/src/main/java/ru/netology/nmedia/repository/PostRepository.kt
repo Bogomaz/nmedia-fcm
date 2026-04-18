@@ -10,6 +10,7 @@ interface PostRepository  {
     fun removeById(id: Long)
 
     fun likeById(id: Long): Post
+    fun unlikeById(id: Long): Post
 
     fun repost(parentId: Long, text: String): Post
 

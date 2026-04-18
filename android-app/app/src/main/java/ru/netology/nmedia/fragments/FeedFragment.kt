@@ -42,6 +42,10 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         super.onViewCreated(view, savedInstanceState)
 
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.load()
+        }
+
         val adapter = PostsAdapter(object : PostListener {
 
             // Этот метод передаёт данные через bundle с помощью делегата
@@ -99,6 +103,8 @@ class FeedFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.empty.isVisible = state.empty
+
+            binding.swipeRefresh.isRefreshing = state.loading
         }
 
         binding.retry.setOnClickListener {
