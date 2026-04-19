@@ -66,12 +66,12 @@ class EditPostFragment : Fragment() {
                         binding.newText.setSelection(post.text.length)
                     }
                 }
-
                 EditMode.REPOST -> {
                     topAppBar.title = getString(R.string.reposted_post_title)
                     viewModel.edited.observe(viewLifecycleOwner) { post ->
                         currentPost = post
                         binding.newText.setText(post.text)
+                        binding.newText.setSelection(post.text.length)
                     }
                 }
             }
@@ -93,13 +93,8 @@ class EditPostFragment : Fragment() {
 
                 EditMode.REPOST -> {
                     currentPost?.let { post ->
-                        viewModel.edited.observe(viewLifecycleOwner){post ->
-                            currentPost = post
-                            binding.newText.setText(post.text)
-                            binding.newText.setSelection(post.text.length)
-                        }
                         viewModel.repost(parentId = post.id, newText = text)
-                        AndroidUtils.showKeyboard(binding.newText)
+                        AndroidUtils.hideKeyboard(requireView())
                         findNavController().popBackStack(R.id.feedFragment, false)
                     }
                 }

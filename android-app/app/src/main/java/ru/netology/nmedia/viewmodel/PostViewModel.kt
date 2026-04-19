@@ -50,67 +50,92 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun likeById(id: Long) {
-        thread {
-            val currentState = _data.value ?: return@thread
-            val currentPosts = currentState.posts
+        val currentState = _data.value ?: return
+        val currentPosts = currentState.posts
 
-            val post = currentPosts.find { it.id == id } ?: return@thread
+        val post = currentPosts.find { it.id == id } ?: return
 
-            try {
-                val likedPost = if (post.isLiked) {
-                    repository.unlikeById(id)
-                } else {
-                    repository.likeById(id)
+        if (post.isLiked) {
+            repository.unlikeByIdAsync(id, object : PostRepository.UnlikeCallback {
+                override fun onSuccess(id: Long) {
+                    loadPosts()
                 }
-                val newPosts = currentPosts.map {
-                    if (it.id == id) likedPost else it
+
+                override fun onError(e: Exception) {
+                    val state = _data.value ?: FeedModel()
+                    _data.postValue(FeedModel(error = true))
+                }
+            })
+        } else {
+            repository.likeByIdAsync(id, object : PostRepository.LikeCallback {
+                override fun onSuccess(id: Long) {
+                    loadPosts()
+                }
+
+                override fun onError(e: Exception) {
+                    val state = _data.value ?: FeedModel()
+                    _data.postValue(state.copy(error = true))
+                }
+            })
+        }
+    }
+
+    fun repost(parentId: Long, newText: String) {
+        val trimmed = newText.trim()
+        if (trimmed.isBlank()) return
+
+        repository.repostAsync(parentId, trimmed, object : PostRepository.SaveCallback {
+            override fun onSuccess(post: Post) {
+                // простой вариант – перезагрузить ленту
+                loadPosts()
+            }
+
+            override fun onError(e: Exception) {
+                val currentState = _data.value ?: FeedModel()
+                _data.postValue(currentState.copy(error = true))
+            }
+        })
+    }
+
+    fun save(newText: String) {
+        val trimmedText = newText.trim()
+        if (trimmedText.isBlank()) return
+
+        val current = edited.value ?: emptyPost
+        val toSave = current.copy(text = trimmedText)
+
+        repository.saveAsync(toSave, object : PostRepository.SaveCallback {
+            override fun onSuccess(post: Post) {
+                // Точечное обновление:
+                val currentState = _data.value ?: FeedModel()
+                val posts = currentState.posts
+
+                val newPosts = if (current.id == 0L) {
+                    // Создание нового поста и добавление его в начало
+                    listOf(post) + posts
+                } else {
+                    // Редактирование. Замена по id
+                    posts.map { if (it.id == post.id) post else it }
                 }
 
                 _data.postValue(
                     currentState.copy(
                         posts = newPosts,
+                        empty = newPosts.isEmpty(),
+                        error = false,
+                        loading = false,
                     )
                 )
-            } catch (e: Exception) {
-                _data.postValue(currentState.copy(error = true))
-            }
-        }
-    }
-
-    fun repost(parentId: Long, newText: String) {
-        thread {
-            val trimmedText = newText.trim()
-            if (trimmedText.isBlank()) return@thread
-
-            try {
-                repository.repost(parentId, trimmedText)
-//                val posts = repository.getAll()
-//                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
-            } catch (_: Exception) {
-//                _data.postValue(FeedModel(error = true))
-            }
-        }
-    }
-
-    fun save(newText: String) {
-        thread {
-            val trimmedText = newText.trim()
-            if (trimmedText.isBlank()) return@thread
-
-            val current = edited.value ?: emptyPost
-            val toSave = current.copy(text = trimmedText)
-
-            try {
-                repository.save(toSave)
-//                val posts = repository.getAll()
-//                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
 
                 edited.postValue(emptyPost)
                 _postCreated.postValue(Unit)
-            } catch (_: Exception) {
-//                _data.postValue(FeedModel(error = true))
             }
-        }
+
+            override fun onError(e: Exception) {
+                val currentState = _data.value ?: FeedModel()
+                _data.postValue(currentState.copy(error = true, loading = false))
+            }
+        })
     }
 
     fun edit(post: Post) {
@@ -118,21 +143,23 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        thread {
-            try {
-                repository.removeById(id)
-                val posts = repository.getAllAsync(object : PostRepository.GetAllCallback {
-                    override fun onSuccess(posts: List<Post>) {
-                        _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
-                    }
+        // Берём текущее состояние ленты
+        val currentState = _data.value ?: return
+        val currentPosts = currentState.posts
 
-                    override fun onError(e: Exception) {
-                        _data.postValue(FeedModel(error = true))
-                    }
-                })
-            } catch (e: Exception) {
-                _data.postValue(FeedModel(error = true))
+        // Можно оптимистично сразу убрать пост из UI:
+        val newPosts = currentPosts.filter { it.id != id }
+        _data.value = currentState.copy(posts = newPosts, empty = newPosts.isEmpty())
+
+        // Запускаем удаление на сервере
+        repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
+            override fun onSuccess(id: Long) {
+                loadPosts()
             }
-        }
+
+            override fun onError(e: Exception) {
+                _data.postValue(currentState.copy(error = true))
+            }
+        })
     }
 }

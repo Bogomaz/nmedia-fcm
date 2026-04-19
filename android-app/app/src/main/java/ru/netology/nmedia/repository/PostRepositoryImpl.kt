@@ -10,6 +10,8 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.FeedModel
+import ru.netology.nmedia.viewmodel.emptyPost
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -31,92 +33,143 @@ class PostRepositoryImpl : PostRepository {
             .build()
 
         client.newCall(request)
-            .enqueue(object : Callback{
-                override fun onResponse(call: Call, response: Response){
-                    try{
-                        val posts = response.body?.string()?: throw RuntimeException("body is null")
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    try {
+                        val posts =
+                            response.body?.string() ?: throw RuntimeException("body is null")
                         callback.onSuccess(gson.fromJson(posts, postType))
-                    }catch(e: Exception){
+                    } catch (e: Exception) {
                         callback.onError(e)
                     }
                 }
-                override fun onFailure(call: Call, e: IOException){
+
+                override fun onFailure(call: Call, e: IOException) {
                     callback.onError(e)
                 }
             })
     }
 
-    override fun save(post: Post): Post {
-        val json = gson.toJson(post)
-        println("SAVE REQUEST JSON: $json")
-
+    override fun saveAsync(post: Post, callback: PostRepository.SaveCallback) {
         val request: Request = Request.Builder()
-            .post(json.toRequestBody(jsonType))
-            .url("${BASE_URL}/api/posts")
+            .post(gson.toJson(post).toRequestBody(jsonType))
+            .url("$BASE_URL/api/posts")
             .build()
-        val call = client.newCall(request)
-        val response = call.execute()
-        val jsonResponse = response.body?.string()
 
-        return gson.fromJson(jsonResponse, Post::class.java)
+        client.newCall(request)
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    try {
+                        response.use { res ->
+                            val body = res.body?.string()
+                                ?: throw RuntimeException("body is null")
+
+                            if (!res.isSuccessful) {
+                                throw RuntimeException("Error ${res.code}: $body")
+                            }
+
+                            val savedPost = gson.fromJson(body, Post::class.java)
+                            callback.onSuccess(savedPost)
+                        }
+                    } catch (e: Exception) {
+                        callback.onError(e)
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+            })
     }
 
-    override fun removeById(id: Long) {
+    override fun removeByIdAsync(id: Long, callback: PostRepository.RemoveCallback) {
         val request: Request = Request.Builder()
             .delete()
             .url("${BASE_URL}/api/posts/$id")
             .build()
 
         client.newCall(request)
-            .execute()
-            .close()
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (it.isSuccessful) {
+                            callback.onSuccess(id)
+                        } else {
+                            callback.onError(
+                                java.lang.RuntimeException("Error ${it.code}: ${it.message}")
+                            )
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+            })
     }
 
-
-    override fun likeById(id: Long): Post {
-        println(">>> CLIENT: LIKE $id")
+    override fun likeByIdAsync(id: Long, callback: PostRepository.LikeCallback) {
         val request: Request = Request.Builder()
             .post("".toRequestBody(jsonType))
             .url("${BASE_URL}/api/posts/$id/likes")
             .build()
 
-        client.newCall(request).execute().use { response ->
-            val body = response.body?.string()
-                ?: throw RuntimeException("body is null")
+        client.newCall(request)
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (it.isSuccessful) {
+                            callback.onSuccess(id)
+                        } else {
+                            callback.onError(
+                                java.lang.RuntimeException("Error ${it.code}: ${it.message}")
+                            )
+                        }
+                    }
+                }
 
-            if (!response.isSuccessful) {
-                throw RuntimeException("Error ${response.code}: $body")
-            }
-            println("LIKE RESPONSE JSON: $body")
-            return gson.fromJson(body, Post::class.java)
-        }
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+            })
     }
 
-    override fun unlikeById(id: Long): Post {
-        println(">>> CLIENT: LIKE $id")
+    override fun unlikeByIdAsync(id: Long, callback: PostRepository.UnlikeCallback) {
         val request: Request = Request.Builder()
             .delete("".toRequestBody(jsonType))
             .url("${BASE_URL}/api/posts/$id/likes")
             .build()
 
-        client.newCall(request).execute().use { response ->
-            val body = response.body?.string()
-                ?: throw RuntimeException("body is null")
+        client.newCall(request)
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (it.isSuccessful) {
+                            callback.onSuccess(id)
+                        } else {
+                            callback.onError(
+                                java.lang.RuntimeException("Error ${it.code}: ${it.message}")
+                            )
+                        }
+                    }
+                }
 
-            if (!response.isSuccessful) {
-                throw RuntimeException("Error ${response.code}: $body")
-            }
-
-            return gson.fromJson(body, Post::class.java)
-        }
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+            })
     }
 
-    override fun repost(parentId: Long, text: String): Post {
+    override fun repostAsync(
+        parentId: Long,
+        text: String,
+        callback: PostRepository.SaveCallback
+    ) {
         val repostPost = Post(
             id = 0,
-            parentId = parentId,            // Ссылка на родителя
+            parentId = parentId,
             publishedDate = System.currentTimeMillis() / 1000,
-            author = "Студент Нетологии",   // Надо вообразить, что это значение берётся из данных текущего пользователя
+            author = "Студент Нетологии",
             text = text,
             videoLink = "",
             videoDescription = "",
@@ -128,7 +181,15 @@ class PostRepositoryImpl : PostRepository {
             repostsCount = 0,
         )
 
-        return save(repostPost)
-    }
+        saveAsync(repostPost, object : PostRepository.SaveCallback {
+            override fun onSuccess(post: Post) {
+                // пробрасываем дальше наверх
+                callback.onSuccess(post)
+            }
 
+            override fun onError(e: Exception) {
+                callback.onError(e)
+            }
+        })
+    }
 }

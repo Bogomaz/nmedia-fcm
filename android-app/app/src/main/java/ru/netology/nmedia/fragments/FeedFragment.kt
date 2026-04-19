@@ -84,7 +84,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onRepost(post: Post) {
-
+                viewModel.edit(post)
                 // Когда нужно поделиться данными с другими приложениями через intent
                 findNavController().navigate(
                     R.id.action_feedFragment_to_editPostFragment,

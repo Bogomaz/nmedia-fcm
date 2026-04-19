@@ -85,15 +85,19 @@ class ReadPostFragment() : Fragment() {
             }
 
             repost.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_readPostFragment_to_EditPostFragment,
-                    Bundle().apply {
-                        this.postId = this@ReadPostFragment.postId
-                        editMode = EditMode.REPOST.name
-                    }
-                )
+                currentPost?.let { post ->
+                    viewModel.edit(post)
 
-                ///TODO: Для шаринга сделать отдельную кнопку. Репост внутри приложения и шаринг - это разные вещи
+                    findNavController().navigate(
+                        R.id.action_readPostFragment_to_EditPostFragment,
+                        Bundle().apply {
+                            this.postId = this@ReadPostFragment.postId
+                            editMode = EditMode.REPOST.name
+                        }
+                    )
+                }
+
+                    ///TODO: Для шаринга сделать отдельную кнопку. Репост внутри приложения и шаринг - это разные вещи
 //                val intent = Intent(Intent.ACTION_SEND).apply {
 //                    putExtra(Intent.EXTRA_TEXT, currentPost?.text)
 //                    type = "text/plain"
@@ -108,47 +112,47 @@ class ReadPostFragment() : Fragment() {
 //                        Toast.LENGTH_SHORT
 //                    ).show()
 //                }
-            }
-
-            playButton.setOnClickListener {
-                requireContext().openVideo(currentPost?.videoLink)
-            }
-
-            video.setOnClickListener {
-                requireContext().openVideo(currentPost?.videoLink)
-            }
-        }
-
-        // Обновление данных при изменении данных поста.
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = state.posts.find { it.id == postId } ?: return@observe
-            currentPost = post
-
-            binding.apply {
-                author.text = post.author
-                avatar.setImageResource(R.drawable.avatar)
-                published.text = formatUnixTime(post.publishedDate)
-
-                content.text = post.text
-                if (post.videoLink.isNotEmpty()) {
-                    video.visibility = View.VISIBLE
-                    videoDescription.text = post.videoDescription
-                    videoDate.text = post.videoDate
-                } else {
-                    video.visibility = View.GONE
                 }
-                likes.isChecked = post.isLiked
-                likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
-                repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
-                comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
-                views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+
+                playButton.setOnClickListener {
+                    requireContext().openVideo(currentPost?.videoLink)
+                }
+
+                video.setOnClickListener {
+                    requireContext().openVideo(currentPost?.videoLink)
+                }
+            }
+
+            // Обновление данных при изменении данных поста.
+            viewModel.data.observe(viewLifecycleOwner) { state ->
+                val post = state.posts.find { it.id == postId } ?: return@observe
+                currentPost = post
+
+                binding.apply {
+                    author.text = post.author
+                    avatar.setImageResource(R.drawable.avatar)
+                    published.text = formatUnixTime(post.publishedDate)
+
+                    content.text = post.text
+                    if (post.videoLink.isNotEmpty()) {
+                        video.visibility = View.VISIBLE
+                        videoDescription.text = post.videoDescription
+                        videoDate.text = post.videoDate
+                    } else {
+                        video.visibility = View.GONE
+                    }
+                    likes.isChecked = post.isLiked
+                    likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
+                    repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
+                    comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
+                    views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+                }
             }
         }
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null // очистить binding в конце жизни фрагмента
-        currentPost = null
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _binding = null // очистить binding в конце жизни фрагмента
+            currentPost = null
+        }
     }
-}

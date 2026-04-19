@@ -22,21 +22,41 @@ class PostService(private val repository: PostRepository) {
         .map { it.toDto() }
         .orElseThrow(::NotFoundException)
 
-    fun save(dto: Post): Post = repository
-        .findById(dto.id)
-        .orElse(
-            PostEntity.fromDto(
-                dto.copy(
-                    likesCount = 0,
-                    isLiked = false,
-                    publishedDate = OffsetDateTime.now().toEpochSecond()
+    fun save(dto: Post): Post {
+        // создаём или находим пост для сохранения
+        val entity = repository
+            .findById(dto.id)
+            .orElse(
+                PostEntity.fromDto(
+                    dto.copy(
+                        likesCount = 0,
+                        isLiked = false,
+                        publishedDate = OffsetDateTime.now().toEpochSecond()
+                    )
                 )
             )
-        )
-        .let {
-            if (it.id == 0L) repository.save(it) else it.content = dto.text
-            it
-        }.toDto()
+
+        val saved = if (entity.id == 0L) {
+            // новый пост (create)
+            val newPost = repository.save(entity)
+
+            // если это репост (есть parentId) – увеличиваем счётчик у родителя
+            dto.parentId?.let { parentId ->
+                repository.findById(parentId).ifPresent { parent ->
+                    parent.repostsCount += 1
+                    repository.save(parent)
+                }
+            }
+
+            newPost
+        } else {
+            // редактирование существующего поста
+            entity.content = dto.text
+            repository.save(entity)
+        }
+
+        return saved.toDto()
+    }
 
     fun removeById(id: Long) {
         repository.findByIdOrNull(id)
