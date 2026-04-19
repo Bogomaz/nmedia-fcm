@@ -33,22 +33,20 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         get() = _postCreated
 
     init {
-        load()
+        loadPosts()
     }
 
-    fun load() {
-        thread {
-            _data.postValue(FeedModel(loading = true))
-
-            val result = try {
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (_: Exception) {
-                FeedModel(error = true)
+    fun loadPosts() {
+        _data.postValue(FeedModel(loading = true))
+        repository.getAllAsync(object : PostRepository.GetAllCallback {
+            override fun onSuccess(posts: List<Post>) {
+                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
             }
 
-            _data.postValue(result)
-        }
+            override fun onError(e: Exception) {
+                _data.postValue(FeedModel(error = true))
+            }
+        })
     }
 
     fun likeById(id: Long) {
@@ -123,8 +121,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         thread {
             try {
                 repository.removeById(id)
-                val posts = repository.getAll()
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                val posts = repository.getAllAsync(object : PostRepository.GetAllCallback {
+                    override fun onSuccess(posts: List<Post>) {
+                        _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                    }
+
+                    override fun onError(e: Exception) {
+                        _data.postValue(FeedModel(error = true))
+                    }
+                })
             } catch (e: Exception) {
                 _data.postValue(FeedModel(error = true))
             }

@@ -43,7 +43,7 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.load()
+            viewModel.loadPosts()
         }
 
         val adapter = PostsAdapter(object : PostListener {
@@ -108,7 +108,7 @@ class FeedFragment : Fragment() {
         }
 
         binding.retry.setOnClickListener {
-            viewModel.load()
+            viewModel.loadPosts()
         }
 
         // Переводит ленту вверх, чтобы пользователь сразу

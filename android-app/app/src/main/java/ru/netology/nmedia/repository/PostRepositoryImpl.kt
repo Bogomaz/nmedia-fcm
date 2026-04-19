@@ -1,13 +1,16 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.LiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import ru.netology.nmedia.dto.Post
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class PostRepositoryImpl : PostRepository {
@@ -22,16 +25,25 @@ class PostRepositoryImpl : PostRepository {
         private val jsonType = "application/json".toMediaType()
     }
 
-    override fun getAll(): List<Post> {
+    override fun getAllAsync(callback: PostRepository.GetAllCallback) {
         val request: Request = Request.Builder()
             .url("${BASE_URL}/api/posts")
             .build()
 
-        val call = client.newCall(request)
-        val response = call.execute()
-        val jsonResponse = response.body?.string()
-
-        return gson.fromJson(jsonResponse, postType)
+        client.newCall(request)
+            .enqueue(object : Callback{
+                override fun onResponse(call: Call, response: Response){
+                    try{
+                        val posts = response.body?.string()?: throw RuntimeException("body is null")
+                        callback.onSuccess(gson.fromJson(posts, postType))
+                    }catch(e: Exception){
+                        callback.onError(e)
+                    }
+                }
+                override fun onFailure(call: Call, e: IOException){
+                    callback.onError(e)
+                }
+            })
     }
 
     override fun save(post: Post): Post {
@@ -59,6 +71,7 @@ class PostRepositoryImpl : PostRepository {
             .execute()
             .close()
     }
+
 
     override fun likeById(id: Long): Post {
         println(">>> CLIENT: LIKE $id")
