@@ -5,6 +5,13 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlin.Int
 
+@Parcelize
+data class Attachment(
+    val url: String,
+    val description: String,
+    val type: String,
+): Parcelable
+
 /**
  * Структура поста на клиенте
  */
@@ -24,5 +31,9 @@ data class Post(
     val isLiked: Boolean = false,
     val viewsCount: Int = 0,
     val repostsCount: Int = 0,
+    val authorAvatar: String? = null,
+    val attachment: Attachment? = null
 ) : Parcelable
+
+
 

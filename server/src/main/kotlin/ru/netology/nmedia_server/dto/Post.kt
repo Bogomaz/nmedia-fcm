@@ -2,6 +2,12 @@ package ru.netology.nmedia_server.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+data class Attachment(
+    val url: String,
+    val description: String,
+    val type: String,   // "IMAGE"
+)
+
 data class Post(
     val id: Long = 0L,
     val parentId: Long? = null,
@@ -17,4 +23,7 @@ data class Post(
     val isLiked: Boolean = false,
     val viewsCount: Int = 0,
     val repostsCount: Int = 0,
+
+    val authorAvatar: String? = null,
+    val attachment: Attachment? = null,
 )

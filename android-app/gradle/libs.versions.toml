@@ -28,6 +28,7 @@ googleServices = "4.4.4"
 playServices = "18.10.0"
 desugaring = "2.1.5"
 okhttp = "4.9.1"
+glide="5.0.7"
 
 
 [libraries]
@@ -57,6 +58,8 @@ firebase = { group = "com.google.firebase", name = "firebase-bom", version.ref =
 #firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging-ktx"}
 play-services = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServices" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp"}
+glide = {module = "com.github.bumptech.glide:glide", version.ref = "glide"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

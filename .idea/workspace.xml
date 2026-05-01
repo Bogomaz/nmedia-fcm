@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d8731d68-a22c-45a5-8dd7-57e7def30eda" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/EditPostFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/EditPostFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/FeedFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/FeedFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/ReadPostFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/ReadPostFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepository.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepositoryImpl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepositoryImpl.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/viewmodel/PostViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/viewmodel/PostViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

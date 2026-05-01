@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.play.services)
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
+    implementation(libs.glide)
 
     coreLibraryDesugaring(libs.desugaring)
     implementation(libs.androidx.core.ktx)

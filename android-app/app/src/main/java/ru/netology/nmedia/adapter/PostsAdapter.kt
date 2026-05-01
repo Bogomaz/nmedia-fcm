@@ -13,6 +13,10 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.service.DateTimeService
 import ru.netology.nmedia.service.ConvertNumberService
 import ru.netology.nmedia.interfaces.PostListener
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import ru.netology.nmedia.repository.Api
+import ru.netology.nmedia.utils.AvatarUtils
 
 class PostsAdapter(
     private val listener: PostListener,
@@ -45,7 +49,16 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             author.text = post.author
-            avatar.setImageResource(R.drawable.avatar)
+
+            val avatarName = AvatarUtils.resolveAvatarFileName(post)
+
+            Glide.with(avatar)
+                .load(Api.avatarUrl(avatarName))
+//                .placeholder(R.drawable.avatar)
+                .error(R.drawable.avatar)
+                .transform(CircleCrop())
+                .into(avatar)
+
             published.text = DateTimeService.formatUnixTime(post.publishedDate)
             content.text = post.text
             if (post.videoLink != "") {
@@ -54,6 +67,18 @@ class PostViewHolder(
                 videoDate.text = post.videoDate
             } else {
                 video.visibility = View.GONE
+            }
+
+            val att = post.attachment
+            if (att != null && att.type == "IMAGE") {
+                attachmentImage.visibility = View.VISIBLE
+                Glide.with(attachmentImage)
+                    .load(Api.imageUrl(att.url))
+                    .placeholder(R.drawable.mock)
+                    .error(R.drawable.mock)
+                    .into(attachmentImage)
+            } else {
+                attachmentImage.visibility = View.GONE
             }
 
             likes.isChecked = post.isLiked

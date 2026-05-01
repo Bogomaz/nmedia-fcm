@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
 
 val emptyPost = Post(
     publishedDate = (System.currentTimeMillis() / 1000),
-    author = "Студент Нетологии",
+    author = "Студент",
     text = "",
     commentsCount = 0,
     likesCount = 0,

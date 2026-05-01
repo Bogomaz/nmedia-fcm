@@ -1,9 +1,11 @@
 package ru.netology.nmedia_server.service
 
+import jakarta.annotation.PostConstruct
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.repository.findByIdOrNull
+import ru.netology.nmedia_server.dto.Attachment
 import ru.netology.nmedia_server.dto.Post
 import ru.netology.nmedia_server.entity.PostEntity
 import ru.netology.nmedia_server.exception.NotFoundException
@@ -13,6 +15,59 @@ import java.time.OffsetDateTime
 @Service
 @Transactional
 class PostService(private val repository: PostRepository) {
+
+    @PostConstruct
+    fun init() {
+        if (repository.count() > 0) return
+
+        val now = OffsetDateTime.now().toEpochSecond()
+
+        // пост с вложением от Сбера
+        repository.save(
+            PostEntity(
+                publishedDate = now,
+                author = "Сбер",
+                content = "Привет, это новый Сбер!",
+                authorAvatar = "sber.jpg",
+                attachment = ru.netology.nmedia_server.entity.AttachmentEmbeddable.fromDto(
+                    Attachment(
+                        url = "sbercard.jpg",
+                        description = "Новая карта от Сбера",
+                        type = "IMAGE"
+                    )
+                )
+            )
+        )
+
+        // пост с вложением от Нетологии
+        repository.save(
+            PostEntity(
+                publishedDate = now - 3600,
+                author = "Нетология",
+                content = "Привет, это новая Нетология!",
+                authorAvatar = "netology.jpg",
+                attachment = ru.netology.nmedia_server.entity.AttachmentEmbeddable.fromDto(
+                    Attachment(
+                        url = "podcast.jpg",
+                        description = "Как запустить свой подкаст: подборка статей",
+                        type = "IMAGE"
+                    )
+                )
+            )
+        )
+
+        // пост без вложения
+        repository.save(
+            PostEntity(
+                publishedDate = now - 7200,
+                author = "Тинькофф",
+                content = "Нам и так норм!",
+                authorAvatar = "tcs.jpg",
+            )
+        )
+    }
+
+
     fun getAll(): List<Post> = repository
         .findAll(Sort.by(Sort.Direction.DESC, "id"))
         .map { it.toDto() }

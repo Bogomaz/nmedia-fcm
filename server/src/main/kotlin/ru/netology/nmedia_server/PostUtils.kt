@@ -23,7 +23,7 @@ val newPost = NewPost(
     userId = 1,
     userName = "Sergey",
     postId = 2,
-    postAuthor = "Netology",
+    postAuthor = "Нетология",
     postTitle = postTitle,
     postContent = postContent,
 )

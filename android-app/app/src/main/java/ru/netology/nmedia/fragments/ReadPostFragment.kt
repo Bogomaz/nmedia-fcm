@@ -18,6 +18,10 @@ import ru.netology.nmedia.utils.openVideo
 import ru.netology.nmedia.viewmodel.PostViewModel
 import kotlin.getValue
 import ru.netology.nmedia.utils.postId
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import ru.netology.nmedia.repository.Api
+import ru.netology.nmedia.utils.AvatarUtils
 
 class ReadPostFragment() : Fragment() {
 
@@ -113,14 +117,6 @@ class ReadPostFragment() : Fragment() {
 //                    ).show()
 //                }
                 }
-
-                playButton.setOnClickListener {
-                    requireContext().openVideo(currentPost?.videoLink)
-                }
-
-                video.setOnClickListener {
-                    requireContext().openVideo(currentPost?.videoLink)
-                }
             }
 
             // Обновление данных при изменении данных поста.
@@ -130,17 +126,33 @@ class ReadPostFragment() : Fragment() {
 
                 binding.apply {
                     author.text = post.author
-                    avatar.setImageResource(R.drawable.avatar)
+
+                    val avatarName = AvatarUtils.resolveAvatarFileName(post)
+
+                    Glide.with(avatar)
+                        .load(Api.avatarUrl(avatarName))
+//                        .placeholder(R.drawable.avatar)
+                        .error(R.drawable.avatar)
+                        .transform(CircleCrop())
+                        .into(avatar)
+
                     published.text = formatUnixTime(post.publishedDate)
 
                     content.text = post.text
-                    if (post.videoLink.isNotEmpty()) {
-                        video.visibility = View.VISIBLE
-                        videoDescription.text = post.videoDescription
-                        videoDate.text = post.videoDate
+
+                    val att = post.attachment
+                    if (att != null && att.type == "IMAGE") {
+                        attachmentImage.visibility = View.VISIBLE
+                        Glide.with(attachmentImage)
+                            .load(Api.imageUrl(att.url))
+                            .placeholder(R.drawable.mock)
+                            .error(R.drawable.mock)
+                            .into(attachmentImage)
                     } else {
-                        video.visibility = View.GONE
+                        attachmentImage.visibility = View.GONE
                     }
+
+
                     likes.isChecked = post.isLiked
                     likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
                     repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
