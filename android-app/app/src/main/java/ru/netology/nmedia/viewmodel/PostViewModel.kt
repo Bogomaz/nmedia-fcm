@@ -9,7 +9,6 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.utils.SingleLiveEvent
-import kotlin.concurrent.thread
 
 val emptyPost = Post(
     publishedDate = (System.currentTimeMillis() / 1000),
@@ -40,11 +39,18 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _data.postValue(FeedModel(loading = true))
         repository.getAllAsync(object : PostRepository.GetAllCallback {
             override fun onSuccess(posts: List<Post>) {
-                _data.postValue(FeedModel(posts = posts, empty = posts.isEmpty()))
+                _data.postValue(
+                    FeedModel(
+                        posts = posts,
+                        empty = posts.isEmpty(),
+                        loading = false,
+                        error = false
+                    )
+                )
             }
 
-            override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error = true))
+            override fun onError(e: Throwable) {
+                _data.postValue(FeedModel(error = true, loading = false))
             }
         })
     }
@@ -52,7 +58,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun likeById(id: Long) {
         val currentState = _data.value ?: return
         val currentPosts = currentState.posts
-
         val post = currentPosts.find { it.id == id } ?: return
 
         if (post.isLiked) {
@@ -62,8 +67,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    val state = _data.value ?: FeedModel()
-                    _data.postValue(FeedModel(error = true))
+                    _data.postValue((_data.value ?: FeedModel()).copy(error = true))
                 }
             })
         } else {
@@ -73,8 +77,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    val state = _data.value ?: FeedModel()
-                    _data.postValue(state.copy(error = true))
+                    _data.postValue((_data.value ?: FeedModel()).copy(error = true))
                 }
             })
         }
@@ -86,11 +89,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
         repository.repostAsync(parentId, trimmed, object : PostRepository.SaveCallback {
             override fun onSuccess(post: Post) {
-                // простой вариант – перезагрузить ленту
                 loadPosts()
             }
 
-            override fun onError(e: Exception) {
+            override fun onError(e: Throwable) {
                 val currentState = _data.value ?: FeedModel()
                 _data.postValue(currentState.copy(error = true))
             }
@@ -106,16 +108,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
         repository.saveAsync(toSave, object : PostRepository.SaveCallback {
             override fun onSuccess(post: Post) {
-                // Точечное обновление:
                 val currentState = _data.value ?: FeedModel()
                 val posts = currentState.posts
 
                 val newPosts = if (current.id == 0L) {
-                    // Создание нового поста и добавление его в начало
-                    listOf(post) + posts
+                    listOf(post) + posts       // создание
                 } else {
-                    // Редактирование. Замена по id
-                    posts.map { if (it.id == post.id) post else it }
+                    posts.map { if (it.id == post.id) post else it }  // редактирование
                 }
 
                 _data.postValue(
@@ -131,7 +130,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 _postCreated.postValue(Unit)
             }
 
-            override fun onError(e: Exception) {
+            override fun onError(e: Throwable) {
                 val currentState = _data.value ?: FeedModel()
                 _data.postValue(currentState.copy(error = true, loading = false))
             }
@@ -143,15 +142,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        // Берём текущее состояние ленты
         val currentState = _data.value ?: return
         val currentPosts = currentState.posts
 
-        // Можно оптимистично сразу убрать пост из UI:
+        // оптимистично убираем из UI
         val newPosts = currentPosts.filter { it.id != id }
         _data.value = currentState.copy(posts = newPosts, empty = newPosts.isEmpty())
 
-        // Запускаем удаление на сервере
         repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
             override fun onSuccess(id: Long) {
                 loadPosts()

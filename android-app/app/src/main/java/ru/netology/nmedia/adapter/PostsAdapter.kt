@@ -15,7 +15,8 @@ import ru.netology.nmedia.service.ConvertNumberService
 import ru.netology.nmedia.interfaces.PostListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import ru.netology.nmedia.repository.Api
+import ru.netology.nmedia.api.avatarUrl
+import ru.netology.nmedia.api.imageUrl
 import ru.netology.nmedia.utils.AvatarUtils
 
 class PostsAdapter(
@@ -53,9 +54,9 @@ class PostViewHolder(
             val avatarName = AvatarUtils.resolveAvatarFileName(post)
 
             Glide.with(avatar)
-                .load(Api.avatarUrl(avatarName))
+                .load(avatarUrl(avatarName))
 //                .placeholder(R.drawable.avatar)
-                .error(R.drawable.avatar)
+//                .error(R.drawable.avatar)
                 .transform(CircleCrop())
                 .into(avatar)
 
@@ -73,7 +74,7 @@ class PostViewHolder(
             if (att != null && att.type == "IMAGE") {
                 attachmentImage.visibility = View.VISIBLE
                 Glide.with(attachmentImage)
-                    .load(Api.imageUrl(att.url))
+                    .load(imageUrl(att.url))
                     .placeholder(R.drawable.mock)
                     .error(R.drawable.mock)
                     .into(attachmentImage)

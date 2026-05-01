@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8731d68-a22c-45a5-8dd7-57e7def30eda" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/api/PostApiService.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/adapter/PostsAdapter.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/adapter/PostsAdapter.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/ReadPostFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/fragments/ReadPostFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepository.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepositoryImpl.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/repository/PostRepositoryImpl.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/viewmodel/PostViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/app/src/main/java/ru/netology/nmedia/viewmodel/PostViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android-app/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/android-app/gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,21 +34,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Study/Kotlin/nmedia-fcm&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "retrofit",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Study/Kotlin/nmedia-fcm"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="d8731d68-a22c-45a5-8dd7-57e7def30eda" name="Changes" comment="" />

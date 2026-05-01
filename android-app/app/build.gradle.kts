@@ -29,6 +29,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
@@ -68,6 +69,8 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.glide)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.logging.interceptor)
 
     coreLibraryDesugaring(libs.desugaring)
     implementation(libs.androidx.core.ktx)

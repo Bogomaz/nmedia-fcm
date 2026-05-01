@@ -14,13 +14,13 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.service.DateTimeService.formatUnixTime
 import ru.netology.nmedia.service.ConvertNumberService
 import ru.netology.nmedia.utils.editMode
-import ru.netology.nmedia.utils.openVideo
 import ru.netology.nmedia.viewmodel.PostViewModel
 import kotlin.getValue
 import ru.netology.nmedia.utils.postId
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import ru.netology.nmedia.repository.Api
+import ru.netology.nmedia.api.avatarUrl
+import ru.netology.nmedia.api.imageUrl
 import ru.netology.nmedia.utils.AvatarUtils
 
 class ReadPostFragment() : Fragment() {
@@ -130,9 +130,9 @@ class ReadPostFragment() : Fragment() {
                     val avatarName = AvatarUtils.resolveAvatarFileName(post)
 
                     Glide.with(avatar)
-                        .load(Api.avatarUrl(avatarName))
+                        .load(avatarUrl(avatarName))
 //                        .placeholder(R.drawable.avatar)
-                        .error(R.drawable.avatar)
+//                        .error(R.drawable.avatar)
                         .transform(CircleCrop())
                         .into(avatar)
 
@@ -144,7 +144,7 @@ class ReadPostFragment() : Fragment() {
                     if (att != null && att.type == "IMAGE") {
                         attachmentImage.visibility = View.VISIBLE
                         Glide.with(attachmentImage)
-                            .load(Api.imageUrl(att.url))
+                            .load(imageUrl(att.url))
                             .placeholder(R.drawable.mock)
                             .error(R.drawable.mock)
                             .into(attachmentImage)
