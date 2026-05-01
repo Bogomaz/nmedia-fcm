@@ -21,6 +21,10 @@ val emptyPost = Post(
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
+    private val _errorEvent = SingleLiveEvent<String>()
+    val errorEvent: LiveData<String>
+        get() = _errorEvent
+
     private val repository: PostRepository = PostRepositoryImpl()
     private val _data = MutableLiveData(FeedModel())
     val data: LiveData<FeedModel>
@@ -67,7 +71,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue((_data.value ?: FeedModel()).copy(error = true))
+                    _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
                 }
             })
         } else {
@@ -77,7 +81,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    _data.postValue((_data.value ?: FeedModel()).copy(error = true))
+                    _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
                 }
             })
         }
@@ -94,7 +98,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onError(e: Throwable) {
                 val currentState = _data.value ?: FeedModel()
-                _data.postValue(currentState.copy(error = true))
+                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
             }
         })
     }
@@ -132,7 +136,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onError(e: Throwable) {
                 val currentState = _data.value ?: FeedModel()
-                _data.postValue(currentState.copy(error = true, loading = false))
+                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
             }
         })
     }
@@ -155,7 +159,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(currentState.copy(error = true))
+                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
             }
         })
     }
