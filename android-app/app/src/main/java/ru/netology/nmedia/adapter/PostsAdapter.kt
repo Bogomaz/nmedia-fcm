@@ -21,16 +21,15 @@ import ru.netology.nmedia.utils.AvatarUtils
 
 class PostsAdapter(
     private val listener: PostListener,
-) : ListAdapter<Post, PostViewHolder>(
-    PostDiffUtils
-) {
+) : ListAdapter<Post, PostViewHolder>(PostDiffUtils) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): PostViewHolder {
-        val view = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(view, listener)
+        val binding =
+            CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostViewHolder(binding, listener)
     }
 
     override fun onBindViewHolder(
@@ -47,87 +46,74 @@ class PostViewHolder(
     private val listener: PostListener
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(post: Post) {
-        binding.apply {
-            author.text = post.author
+    fun bind(post: Post) = with(binding) {
+        // Автор и аватар
+        author.text = post.author
 
-            val avatarName = AvatarUtils.resolveAvatarFileName(post)
+        val avatarName = post.authorAvatar ?: "noname.png"
+        Glide.with(avatar)
+            .load(avatarUrl(avatarName))
+            .timeout(15_000)
+            .transform(CircleCrop())
+            .into(avatar)
 
-            Glide.with(avatar)
-                .load(avatarUrl(avatarName))
-//                .placeholder(R.drawable.avatar)
-//                .error(R.drawable.avatar)
-                .transform(CircleCrop())
-                .into(avatar)
+        // Дата и текст
+        published.text = DateTimeService.formatUnixTime(post.publishedDate)
+        content.text = post.text
 
-            published.text = DateTimeService.formatUnixTime(post.publishedDate)
-            content.text = post.text
-            if (post.videoLink != "") {
-                video.visibility = View.VISIBLE
-                videoDescription.text = post.videoDescription
-                videoDate.text = post.videoDate
-            } else {
-                video.visibility = View.GONE
-            }
+        // Вложение (картинка)
+        val att = post.attachment
+        if (att != null && att.type == "IMAGE") {
+            attachmentImage.visibility = View.VISIBLE
+            Glide.with(attachmentImage)
+                .load(imageUrl(att.url))
+                .timeout(15_000)
+                .placeholder(R.drawable.mock)
+                .error(R.drawable.mock)
+                .into(attachmentImage)
+        } else {
+            attachmentImage.visibility = View.GONE
+        }
 
-            val att = post.attachment
-            if (att != null && att.type == "IMAGE") {
-                attachmentImage.visibility = View.VISIBLE
-                Glide.with(attachmentImage)
-                    .load(imageUrl(att.url))
-                    .placeholder(R.drawable.mock)
-                    .error(R.drawable.mock)
-                    .into(attachmentImage)
-            } else {
-                attachmentImage.visibility = View.GONE
-            }
+        // Лайки/репосты/прочее
+        likes.isChecked = post.isLiked
+        likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
+        repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
+        comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
+        views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
 
-            likes.isChecked = post.isLiked
-            likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
-            repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
-            comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
-            views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+        // Обработчики
+        content.setOnClickListener {
+            listener.onViewPost(post)
+        }
 
-            content.setOnClickListener {
-                listener.onViewPost(post)
-            }
+        likes.setOnClickListener {
+            listener.onLike(post)
+        }
 
-            likes.setOnClickListener {
-                listener.onLike(post)
-            }
+        repost.setOnClickListener {
+            listener.onRepost(post)
+        }
 
-            repost.setOnClickListener {
-                listener.onRepost(post)
-            }
-
-            video.setOnClickListener {
-                listener.onPlayVideo(post)
-            }
-
-            playButton.setOnClickListener {
-                listener.onPlayVideo(post)
-            }
-
-            menu.setOnClickListener {
-                PopupMenu(it.context, it).apply {
-                    inflate(R.menu.post_menu)
-                    setOnMenuItemClickListener { menuItem ->
-                        when (menuItem.itemId) {
-                            R.id.remove -> {
-                                listener.onRemove(post)
-                                true
-                            }
-
-                            R.id.edit -> {
-                                listener.onEdit(post)
-                                true
-                            }
-
-                            else -> false
+        menu.setOnClickListener {
+            PopupMenu(it.context, it).apply {
+                inflate(R.menu.post_menu)
+                setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.remove -> {
+                            listener.onRemove(post)
+                            true
                         }
+
+                        R.id.edit -> {
+                            listener.onEdit(post)
+                            true
+                        }
+
+                        else -> false
                     }
-                    show()
                 }
+                show()
             }
         }
     }
@@ -143,5 +129,4 @@ object PostDiffUtils : DiffUtil.ItemCallback<Post>() {
         oldItem: Post,
         newItem: Post
     ) = oldItem == newItem
-
 }

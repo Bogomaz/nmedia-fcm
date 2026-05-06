@@ -1,173 +1,214 @@
 package ru.netology.nmedia.repository
 
-import okhttp3.Call
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import retrofit2.Callback
+import androidx.lifecycle.map
 import ru.netology.nmedia.api.PostApi
+import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
-import java.io.IOException
-import kotlin.collections.orEmpty
+import ru.netology.nmedia.dto.Author
+import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.entity.toDto
+import ru.netology.nmedia.entity.toEntity
 
-class PostRepositoryImpl : PostRepository {
-    override fun getAllAsync(callback: PostRepository.GetAllCallback) {
-        PostApi.service.getAll()
-            .enqueue(object : Callback<List<Post>> {
-                override fun onResponse(
-                    call: retrofit2.Call<List<Post>?>,
-                    response: retrofit2.Response<List<Post>?>
-                ) {
-                    if (response.isSuccessful) {
-                        callback.onSuccess(response.body().orEmpty())
-                    } else {
-                        callback.onError(
-                            java.lang.RuntimeException(response.errorBody()?.string().orEmpty())
-                        )
-                    }
-                }
 
-                override fun onFailure(
-                    call: retrofit2.Call<List<Post>?>,
-                    t: Throwable
-                ) {
-                    callback.onError(t)
+class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
+    //override val data = dao.getAll().map(List<PostEntity>::toDto)
+    override val data = dao.getAll().map { entities -> entities.toDto() }
+    private val api = PostApi.service
+
+    override suspend fun getAll(): List<Post> {
+        val postsFromServer = api.getAll()
+
+        // Добавляем авторов и сразу раскладываем:
+        //    serverId = id с сервера, локальный id пока 0.
+        val enriched = postsFromServer.map { postFromServer ->
+            val withAuthor = try {
+                val author: Author = api.getAuthorById(postFromServer.authorId)
+                postFromServer.copy(
+                    author = author.name,
+                    authorAvatar = author.avatar,
+                )
+            } catch (e: Exception) {
+                if (postFromServer.authorId == 0L) {
+                    postFromServer.copy(
+                        author = "Студент",
+                        authorAvatar = "noname.png",
+                    )
+                } else {
+                    postFromServer.copy(
+                        author = "Noname",
+                        authorAvatar = null,
+                    )
                 }
-            })
+            }
+            // id с сервера кладём в serverId, локальный пока 0
+            withAuthor.copy(
+                id = 0L,
+                serverId = withAuthor.id,
+            )
+        }
+
+        // Для каждого поста с сервера:
+        //    - если уже есть запись с таким serverId → обновляем её, сохраняя localId;
+        //    - если нет → вставляем новую.
+        for (post in enriched) {
+            val serverId = post.serverId ?: continue
+
+            val existing = dao.getByServerId(serverId)
+            val entity = if (existing != null) {
+                // сохраняем localId, обновляем остальные поля
+                PostEntity.fromDto(
+                    post.copy(id = existing.localId)
+                )
+            } else {
+                PostEntity.fromDto(post)
+            }
+
+            if (existing != null) {
+                dao.update(entity)
+            } else {
+                dao.insert(entity)
+            }
+        }
+
+        return enriched
     }
 
-    override fun saveAsync(post: Post, callback: PostRepository.SaveCallback) {
-        PostApi.service.savePost(post)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(
-                    call: retrofit2.Call<Post?>,
-                    response: retrofit2.Response<Post?>
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body != null) {
-                            callback.onSuccess(body)
-                        } else {
-                            callback.onError(RuntimeException("Body is null"))
-                        }
-                    } else {
-                        callback.onError(
-                            RuntimeException(response.errorBody()?.string().orEmpty())
-                        )
-                    }
-                }
+    override suspend fun save(post: Post): Post {
+        // Сохраняем только локально без serverId и получаем localId
+        val localEntity = PostEntity.fromDto(
+            post.copy(
+                id = 0L,    // Room сгенерит localId
+                serverId = post.serverId, // для новых постов будет null
+            )
+        )
+        val localId = dao.insert(localEntity)
 
-                override fun onFailure(
-                    call: retrofit2.Call<Post?>,
-                    t: Throwable
-                ) {
-                    callback.onError(t)
-                }
-            })
+        // Готовим пост для отправки на сервер
+        val forServer = post.copy(
+            id = post.serverId ?: 0L, // либо id, который ранее получили с сервера, либо ноль.
+            serverId = null, // это серверу не показываем
+        )
+        val savedFromServer = api.savePost(forServer)
+
+        // Добавляем автора
+        val withAuthor = try {
+            val author = api.getAuthorById(savedFromServer.authorId)
+            savedFromServer.copy(
+                author = author.name,
+                authorAvatar = author.avatar
+            )
+        } catch (e: Exception) {
+            if (savedFromServer.authorId == 0L) {
+                savedFromServer.copy(author = "Студент", authorAvatar = "noname.png")
+            } else {
+                savedFromServer.copy(author = "Noname", authorAvatar = null)
+            }
+        }
+
+        // Обновляем запись в Room
+        val final = withAuthor.copy(
+            id = localId,
+            serverId = savedFromServer.id,
+        )
+        dao.update(PostEntity.fromDto(final))
+        return final
     }
 
-    override fun removeByIdAsync(id: Long, callback: PostRepository.RemoveCallback) {
-        PostApi.service.removeById(id)
-            .enqueue(object : Callback<Unit> {
+    override suspend fun removeById(id: Long) {
+        val entity = dao.getByLocalId(id) ?: return
+        val serverId = entity.serverId
 
-                override fun onResponse(
-                    call: retrofit2.Call<Unit?>,
-                    response: retrofit2.Response<Unit?>
-                ) {
-                    if (response.isSuccessful) {
-                        callback.onSuccess(id)
-                    } else {
-                        callback.onError(
-                            RuntimeException(response.errorBody()?.string().orEmpty())
-                        )
-                    }
-                }
-
-                override fun onFailure(call: retrofit2.Call<Unit?>, t: Throwable) {
-                    callback.onError(Exception(t))
-                }
-            })
+        // Сначала пост будет удалён на сервере, потом из локального кеша.
+        if (serverId != null) {
+            api.removeById(serverId)
+        }
+        dao.removeByLocalId(id)
     }
 
-    override fun likeByIdAsync(id: Long, callback: PostRepository.LikeCallback) {
-        PostApi.service.likeById(id)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(
-                    call: retrofit2.Call<Post?>,
-                    response: retrofit2.Response<Post?>
-                ) {
-                    if (response.isSuccessful) {
-                        callback.onSuccess(id)
-                    } else {
-                        callback.onError(
-                            RuntimeException(response.errorBody()?.string().orEmpty())
-                        )
-                    }
-                }
+    override suspend fun likeById(id: Long): Post {
+        val entity = dao.getByLocalId(id) ?: return data.value?.first { it.id == id }
+            ?: throw IllegalStateException()
+        val serverId = entity.serverId ?: return entity.toDto()
 
-                override fun onFailure(
-                    call: retrofit2.Call<Post?>,
-                    t: Throwable
-                ) {
-                    callback.onError(Exception(t))
-                }
-            })
+        val updatedFromServer = api.likeById(serverId)
+
+        val old = entity.toDto()
+        val final = old.copy(
+            // локальный и серверный id сохраняем
+            id = id,
+            serverId = serverId,
+
+            // обновляем то, что реально поменял сервер
+            isLiked = updatedFromServer.isLiked,
+            likesCount = updatedFromServer.likesCount,
+        )
+        dao.update(PostEntity.fromDto(final))
+        return final
     }
 
-    override fun unlikeByIdAsync(id: Long, callback: PostRepository.UnlikeCallback) {
-        PostApi.service.unlikeById(id)
-            .enqueue(object : Callback<Post> {
-                override fun onResponse(
-                    call: retrofit2.Call<Post?>,
-                    response: retrofit2.Response<Post?>
-                ) {
-                    if (response.isSuccessful) {
-                        callback.onSuccess(id)
-                    } else {
-                        callback.onError(
-                            RuntimeException(response.errorBody()?.string().orEmpty())
-                        )
-                    }
-                }
+    override suspend fun unlikeById(id: Long): Post {
+        val entity = dao.getByLocalId(id) ?: return data.value?.first { it.id == id }
+            ?: throw IllegalStateException()
+        val serverId = entity.serverId ?: return entity.toDto()
 
-                override fun onFailure(
-                    call: retrofit2.Call<Post?>,
-                    t: Throwable
-                ) {
-                    callback.onError(Exception(t))
-                }
-            })
+        val updatedFromServer = api.unlikeById(serverId)
+
+        val old = entity.toDto()
+        val final = old.copy(
+            id = id,
+            serverId = serverId,
+            isLiked = updatedFromServer.isLiked,
+            likesCount = updatedFromServer.likesCount,
+        )
+        dao.update(PostEntity.fromDto(final))
+        return final
     }
 
-    override fun repostAsync(
-        parentId: Long,
-        text: String,
-        callback: PostRepository.SaveCallback
-    ) {
-        val repostPost = Post(
-            id = 0,
-            parentId = parentId,
-            publishedDate = System.currentTimeMillis() / 1000,
-            author = "Студент Нетологии",
+    override suspend fun repost(parentId: Long, text: String): Post {
+        // создаём локальную запись-черновик
+        val localDraft = PostEntity.fromDto(
+            Post(
+                id = 0L,
+                serverId = null,
+                authorId = 4L,      // репост делается всегда от имени хардкодного студента
+                text = text,
+                isLiked = false,
+                likesCount = 0,
+            )
+        )
+        val localId = dao.insert(localDraft)
+
+        // Готовим пост для сервера
+        val forServer = Post(
+            id = 0L,
+            authorId = 4L,
             text = text,
-            videoLink = "",
-            videoDescription = "",
-            videoDate = "",
-            commentsCount = 0,
-            likesCount = 0,
             isLiked = false,
-            viewsCount = 0,
-            repostsCount = 0,
+            likesCount = 0,
         )
 
-        saveAsync(repostPost, object : PostRepository.SaveCallback {
-            override fun onSuccess(post: Post) {
-                callback.onSuccess(post)
-            }
+        val savedFromServer = api.savePost(forServer)
 
-            override fun onError(e: Throwable) {
-                callback.onError(e)
+        val withAuthor = try {
+            val author = api.getAuthorById(savedFromServer.authorId)
+            savedFromServer.copy(
+                author = author.name,
+                authorAvatar = author.avatar,
+            )
+        } catch (e: Exception) {
+            if (savedFromServer.authorId == 0L) {
+                savedFromServer.copy(author = "Студент", authorAvatar = "noname.png")
+            } else {
+                savedFromServer.copy(author = "Noname", authorAvatar = null)
             }
-        })
+        }
+
+        val final = withAuthor.copy(
+            id = localId,
+            serverId = savedFromServer.id,
+        )
+        dao.update(PostEntity.fromDto(final))
+
+        return final
     }
 }

@@ -18,7 +18,6 @@ import androidx.fragment.app.activityViewModels
 import ru.netology.nmedia.interfaces.PostListener
 import ru.netology.nmedia.dto.EditMode
 import ru.netology.nmedia.utils.editMode
-import ru.netology.nmedia.utils.openVideo
 
 import ru.netology.nmedia.utils.postId
 
@@ -77,10 +76,6 @@ class FeedFragment : Fragment() {
 
             override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
-            }
-
-            override fun onPlayVideo(post: Post) {
-                requireContext().openVideo(post.videoLink)
             }
 
             override fun onLike(post: Post) {

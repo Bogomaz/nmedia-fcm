@@ -21,9 +21,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import ru.netology.nmedia.api.avatarUrl
 import ru.netology.nmedia.api.imageUrl
-import ru.netology.nmedia.utils.AvatarUtils
 
-class ReadPostFragment() : Fragment() {
+class ReadPostFragment : Fragment() {
 
     private var postId: Long = 0
     private var currentPost: Post? = null
@@ -49,14 +48,13 @@ class ReadPostFragment() : Fragment() {
 
         // шапка, меню и обработчики кнопок
         binding.apply {
-            //Кебаб-меню
             topAppBar.inflateMenu(R.menu.post_menu)
             topAppBar.setOnMenuItemClickListener { menuItem ->
                 currentPost?.let { post ->
                     when (menuItem.itemId) {
                         R.id.remove -> {
-                            viewModel.removeById(postId)    // удалить выбранный пост
-                            findNavController().navigateUp() // вернуться на тот фрагмент, с которого пришли.
+                            viewModel.removeById(postId)
+                            findNavController().navigateUp()
                             true
                         }
 
@@ -77,7 +75,6 @@ class ReadPostFragment() : Fragment() {
                 } ?: false
             }
 
-            // Кнопка Назад
             topAppBar.setNavigationIcon(R.drawable.ic_close_editing)
             topAppBar.setTitle(R.string.reading_post_title)
             topAppBar.setNavigationOnClickListener {
@@ -91,7 +88,6 @@ class ReadPostFragment() : Fragment() {
             repost.setOnClickListener {
                 currentPost?.let { post ->
                     viewModel.edit(post)
-
                     findNavController().navigate(
                         R.id.action_readPostFragment_to_EditPostFragment,
                         Bundle().apply {
@@ -100,71 +96,52 @@ class ReadPostFragment() : Fragment() {
                         }
                     )
                 }
-
-                    ///TODO: Для шаринга сделать отдельную кнопку. Репост внутри приложения и шаринг - это разные вещи
-//                val intent = Intent(Intent.ACTION_SEND).apply {
-//                    putExtra(Intent.EXTRA_TEXT, currentPost?.text)
-//                    type = "text/plain"
-//                }
-//
-//                try {
-//                    startActivity(Intent.createChooser(intent, null))
-//                } catch (e: Exception) {
-//                    Toast.makeText(
-//                        requireContext(),
-//                        "Apps not found",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
-                }
-            }
-
-            // Обновление данных при изменении данных поста.
-            viewModel.data.observe(viewLifecycleOwner) { state ->
-                val post = state.posts.find { it.id == postId } ?: return@observe
-                currentPost = post
-
-                binding.apply {
-                    author.text = post.author
-
-                    val avatarName = AvatarUtils.resolveAvatarFileName(post)
-
-                    Glide.with(avatar)
-                        .load(avatarUrl(avatarName))
-//                        .placeholder(R.drawable.avatar)
-//                        .error(R.drawable.avatar)
-                        .transform(CircleCrop())
-                        .into(avatar)
-
-                    published.text = formatUnixTime(post.publishedDate)
-
-                    content.text = post.text
-
-                    val att = post.attachment
-                    if (att != null && att.type == "IMAGE") {
-                        attachmentImage.visibility = View.VISIBLE
-                        Glide.with(attachmentImage)
-                            .load(imageUrl(att.url))
-                            .placeholder(R.drawable.mock)
-                            .error(R.drawable.mock)
-                            .into(attachmentImage)
-                    } else {
-                        attachmentImage.visibility = View.GONE
-                    }
-
-
-                    likes.isChecked = post.isLiked
-                    likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
-                    repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
-                    comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
-                    views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
-                }
             }
         }
 
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null // очистить binding в конце жизни фрагмента
-            currentPost = null
+        // Обновление данных при изменении
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            val post = state.posts.find { it.id == postId } ?: return@observe
+            currentPost = post
+
+            binding.apply {
+                author.text = post.author
+
+                val avatarName = post.authorAvatar ?: "noname.png"
+                Glide.with(avatar)
+                    .load(avatarUrl(avatarName))
+                    .timeout(15_000)
+                    .transform(CircleCrop())
+                    .into(avatar)
+
+                published.text = formatUnixTime(post.publishedDate)
+                content.text = post.text
+
+                val att = post.attachment
+                if (att != null && att.type == "IMAGE") {
+                    attachmentImage.visibility = View.VISIBLE
+                    Glide.with(attachmentImage)
+                        .load(imageUrl(att.url))
+                        .timeout(15_000)
+                        .placeholder(R.drawable.mock)
+                        .error(R.drawable.mock)
+                        .into(attachmentImage)
+                } else {
+                    attachmentImage.visibility = View.GONE
+                }
+
+                likes.isChecked = post.isLiked
+                likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
+                repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
+                comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
+                views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+            }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        currentPost = null
+    }
+}

@@ -1,39 +1,33 @@
 package ru.netology.nmedia_server.service
 
-import jakarta.annotation.PostConstruct
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.data.repository.findByIdOrNull
-import ru.netology.nmedia_server.dto.Attachment
-import ru.netology.nmedia_server.dto.Post
-import ru.netology.nmedia_server.entity.PostEntity
+import ru.netology.nmedia_server.dto.Comment
+import ru.netology.nmedia_server.entity.CommentEntity
 import ru.netology.nmedia_server.exception.NotFoundException
-import ru.netology.nmedia_server.repository.PostRepository
+import ru.netology.nmedia_server.repository.CommentRepository
 import java.time.OffsetDateTime
 
 @Service
 @Transactional
-class PostService(
-    private val repository: PostRepository,
-    private val commentService: CommentService,
-) {
-    fun getAll(): List<Post> = repository
-        .findAll(Sort.by(Sort.Direction.DESC, "id"))
+class CommentService(private val repository: CommentRepository) {
+    fun getAllByPostId(postId: Long): List<Comment> = repository
+        .findAllByPostId(postId, Sort.by(Sort.Direction.ASC, "id"))
         .map { it.toDto() }
 
-    fun getById(id: Long): Post = repository
+    fun getById(id: Long): Comment = repository
         .findById(id)
         .map { it.toDto() }
         .orElseThrow(::NotFoundException)
 
-    fun save(dto: Post): Post = repository
+    fun save(dto: Comment): Comment = repository
         .findById(dto.id)
         .orElse(
-            PostEntity.fromDto(
+            CommentEntity.fromDto(
                 dto.copy(
-//                    likes = 0,
-//                    likedByMe = false,
+                    likes = 0,
+                    likedByMe = false,
                     published = OffsetDateTime.now().toEpochSecond()
                 )
             )
@@ -45,11 +39,8 @@ class PostService(
         }.toDto()
 
     fun removeById(id: Long): Unit = repository.deleteById(id)
-        .also {
-            commentService.removeAllByPostId(id)
-        }
 
-    fun likeById(id: Long): Post = repository
+    fun likeById(id: Long): Comment = repository
         .findById(id)
         .orElseThrow(::NotFoundException)
         .apply {
@@ -58,7 +49,7 @@ class PostService(
         }
         .toDto()
 
-    fun unlikeById(id: Long): Post = repository
+    fun unlikeById(id: Long): Comment = repository
         .findById(id)
         .orElseThrow(::NotFoundException)
         .apply {
@@ -66,4 +57,7 @@ class PostService(
             likedByMe = false
         }
         .toDto()
+
+    fun removeAllByPostId(postId: Long): Unit = repository
+        .removeAllByPostId(postId)
 }

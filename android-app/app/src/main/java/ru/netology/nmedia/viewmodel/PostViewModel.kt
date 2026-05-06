@@ -9,6 +9,9 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.utils.SingleLiveEvent
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import ru.netology.nmedia.db.AppDb
 
 val emptyPost = Post(
     publishedDate = (System.currentTimeMillis() / 1000),
@@ -21,69 +24,61 @@ val emptyPost = Post(
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
-    private val _errorEvent = SingleLiveEvent<String>()
-    val errorEvent: LiveData<String>
-        get() = _errorEvent
+    private val repository: PostRepository =
+        PostRepositoryImpl(AppDb.getInstance(application).postDao)
 
-    private val repository: PostRepository = PostRepositoryImpl()
     private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel>
-        get() = _data
+    val data: LiveData<FeedModel> get() = _data
     val edited = MutableLiveData(emptyPost)
 
     private val _postCreated = SingleLiveEvent<Unit>()
-    val postCreated: LiveData<Unit>
-        get() = _postCreated
+    val postCreated: LiveData<Unit> get() = _postCreated
+    private val _errorEvent = SingleLiveEvent<String>()
+    val errorEvent: LiveData<String> get() = _errorEvent
+
+    private val dbSource = repository.data
 
     init {
+        _data.value = FeedModel(loading = true)
+        dbSource.observeForever {posts ->
+            val current = _data.value ?: FeedModel()
+            _data.value = current.copy(
+                posts = posts,
+                empty = posts.isEmpty(),
+                loading = false,
+                error = false,
+            )
+        }
         loadPosts()
     }
 
     fun loadPosts() {
-        _data.postValue(FeedModel(loading = true))
-        repository.getAllAsync(object : PostRepository.GetAllCallback {
-            override fun onSuccess(posts: List<Post>) {
-                _data.postValue(
-                    FeedModel(
-                        posts = posts,
-                        empty = posts.isEmpty(),
-                        loading = false,
-                        error = false
-                    )
+        viewModelScope.launch {
+            try {
+                _data.value = _data.value?.copy(loading = true, error = false)
+                repository.getAll() // результат попадёт в Room и вернётся через подписку.
+                _data.value = _data.value?.copy(
+                    loading = false,
+                    empty = _data.value?.posts?.isEmpty() ?: true,
                 )
+            } catch (e: Exception) {
+                _data.value = _data.value?.copy(loading = false, error = true)
             }
-
-            override fun onError(e: Throwable) {
-                _data.postValue(FeedModel(error = true, loading = false))
-            }
-        })
+        }
     }
 
     fun likeById(id: Long) {
-        val currentState = _data.value ?: return
-        val currentPosts = currentState.posts
-        val post = currentPosts.find { it.id == id } ?: return
-
-        if (post.isLiked) {
-            repository.unlikeByIdAsync(id, object : PostRepository.UnlikeCallback {
-                override fun onSuccess(id: Long) {
-                    loadPosts()
+        viewModelScope.launch {
+            try {
+                val currentPost = _data.value?.posts?.find { it.id == id } ?: return@launch
+                if (currentPost.isLiked) {
+                    repository.unlikeById(id)
+                } else {
+                    repository.likeById(id)
                 }
-
-                override fun onError(e: Exception) {
-                    _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
-                }
-            })
-        } else {
-            repository.likeByIdAsync(id, object : PostRepository.LikeCallback {
-                override fun onSuccess(id: Long) {
-                    loadPosts()
-                }
-
-                override fun onError(e: Exception) {
-                    _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
-                }
-            })
+            } catch (e: Exception) {
+                _errorEvent.value = "Ошибка соединения с сервером. Попробуйте ещё раз."
+            }
         }
     }
 
@@ -91,54 +86,35 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         val trimmed = newText.trim()
         if (trimmed.isBlank()) return
 
-        repository.repostAsync(parentId, trimmed, object : PostRepository.SaveCallback {
-            override fun onSuccess(post: Post) {
-                loadPosts()
+        viewModelScope.launch {
+            try {
+                repository.repost(parentId, trimmed)
+                // запись появится в Room → UI обновится сам
+            } catch (e: Exception) {
+                _errorEvent.value = "Ошибка соединения с сервером. Попробуйте ещё раз."
             }
-
-            override fun onError(e: Throwable) {
-                val currentState = _data.value ?: FeedModel()
-                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
-            }
-        })
+        }
     }
 
     fun save(newText: String) {
         val trimmedText = newText.trim()
         if (trimmedText.isBlank()) return
 
-        val current = edited.value ?: emptyPost
-        val toSave = current.copy(text = trimmedText)
+        viewModelScope.launch {
+            try {
+                val current = edited.value ?: emptyPost
+                val toSave = current.copy(text = trimmedText)
 
-        repository.saveAsync(toSave, object : PostRepository.SaveCallback {
-            override fun onSuccess(post: Post) {
-                val currentState = _data.value ?: FeedModel()
-                val posts = currentState.posts
+                repository.save(toSave)
+                // после успешного ответа репозиторий обновит Room,
+                // и новый/обновлённый пост сам попадёт в ленту
 
-                val newPosts = if (current.id == 0L) {
-                    listOf(post) + posts       // создание
-                } else {
-                    posts.map { if (it.id == post.id) post else it }  // редактирование
-                }
-
-                _data.postValue(
-                    currentState.copy(
-                        posts = newPosts,
-                        empty = newPosts.isEmpty(),
-                        error = false,
-                        loading = false,
-                    )
-                )
-
-                edited.postValue(emptyPost)
-                _postCreated.postValue(Unit)
+                edited.value = emptyPost
+                _postCreated.value = Unit
+            } catch (e: Exception) {
+                _errorEvent.value = "Ошибка соединения с сервером. Попробуйте ещё раз."
             }
-
-            override fun onError(e: Throwable) {
-                val currentState = _data.value ?: FeedModel()
-                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
-            }
-        })
+        }
     }
 
     fun edit(post: Post) {
@@ -146,21 +122,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun removeById(id: Long) {
-        val currentState = _data.value ?: return
-        val currentPosts = currentState.posts
-
-        // оптимистично убираем из UI
-        val newPosts = currentPosts.filter { it.id != id }
-        _data.value = currentState.copy(posts = newPosts, empty = newPosts.isEmpty())
-
-        repository.removeByIdAsync(id, object : PostRepository.RemoveCallback {
-            override fun onSuccess(id: Long) {
-                loadPosts()
+        viewModelScope.launch {
+            try {
+                repository.removeById(id)
+                // Room удалит пост, и он исчезнет из UI
+            } catch (e: Exception) {
+                _errorEvent.value = "Ошибка соединения с сервером. Попробуйте ещё раз."
             }
-
-            override fun onError(e: Exception) {
-                _errorEvent.postValue("Ошибка соединения с сервером. Попробуйте ещё раз.")
-            }
-        })
+        }
     }
 }

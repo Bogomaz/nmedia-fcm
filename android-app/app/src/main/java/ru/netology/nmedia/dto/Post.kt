@@ -17,22 +17,29 @@ data class Attachment(
  */
 @Parcelize
 data class Post(
-    val id: Long = 0L,
-    val parentId: Long? = null,
-    val publishedDate: Long = 0,
+    val id: Long = 0L, // локальный id для Room
+    val serverId: Long? = null, // серверный id
+
+    val authorId: Long = 0L,
     val author: String = "",
+    val authorAvatar: String? = null,
+
+    // Поля, которые приходят с сервера
+    @SerializedName("content")
     val text: String = "",
-    val videoLink: String = "",
-    val videoDescription: String = "",
-    val videoDate: String = "",
-    val commentsCount: Int = 0,
-    val likesCount: Int = 0,
-    @SerializedName("liked")
+    @SerializedName("published")
+    val publishedDate: Long = 0,
+    @SerializedName("likedByMe")
     val isLiked: Boolean = false,
+    @SerializedName("likes")
+    val likesCount: Int = 0,
+    val attachment: Attachment? = null,
+
+    // Поля, которые используются на клиенте, но пока отсутствуют на сервер
+    val parentId: Long? = null,
+    val commentsCount: Int = 0,
     val viewsCount: Int = 0,
     val repostsCount: Int = 0,
-    val authorAvatar: String? = null,
-    val attachment: Attachment? = null
 ) : Parcelable
 
 

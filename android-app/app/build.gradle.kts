@@ -39,7 +39,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            manifestPlaceholders["usesCleartextTraffic"] = "false"
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
         debug {
             // пример плейсхолдера для манифеста
@@ -61,6 +61,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.core)
     implementation(platform(libs.firebase))
     implementation("com.google.firebase:firebase-messaging-ktx:24.1.2") // из BOM он не подтягивается. я в отчаянии.
 //    implementation(libs.firebase.messaging)

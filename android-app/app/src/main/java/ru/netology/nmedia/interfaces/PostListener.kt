@@ -8,6 +8,5 @@ interface PostListener {
     fun onRemove(post: Post)
     fun onLike(post: Post)
     fun onRepost(post: Post)
-    fun onPlayVideo(post: Post)
     fun onViewPost(post: Post)
 }
