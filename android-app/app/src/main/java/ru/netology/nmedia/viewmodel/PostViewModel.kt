@@ -10,6 +10,10 @@ import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.utils.SingleLiveEvent
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.db.AppDb
 
@@ -27,8 +31,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PostRepository =
         PostRepositoryImpl(AppDb.getInstance(application).postDao)
 
-    private val _data = MutableLiveData(FeedModel())
-    val data: LiveData<FeedModel> get() = _data
+    private val _data = MutableStateFlow(FeedModel())
+    val data: StateFlow<FeedModel> get() = _data
     val edited = MutableLiveData(emptyPost)
 
     private val _postCreated = SingleLiveEvent<Unit>()
@@ -36,34 +40,64 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorEvent = SingleLiveEvent<String>()
     val errorEvent: LiveData<String> get() = _errorEvent
 
-    private val dbSource = repository.data
-
     init {
-        _data.value = FeedModel(loading = true)
-        dbSource.observeForever {posts ->
-            val current = _data.value ?: FeedModel()
-            _data.value = current.copy(
-                posts = posts,
-                empty = posts.isEmpty(),
-                loading = false,
-                error = false,
-            )
+        // поток кешированных постов из Room
+        viewModelScope.launch {
+            repository.data.collect { posts ->
+                _data.update { cur ->
+                    cur.copy(
+                        posts = posts,
+                        empty = posts.isEmpty(),
+                        loading = false,
+                        error = false,
+                    )
+                }
+            }
+        }
+        // поток количества скрытых постов (для плашки)
+        viewModelScope.launch {
+            repository.hiddenCount.collect { count ->
+                _data.update { cur ->
+                    cur.copy(newCount = count)
+                }
+            }
         }
         loadPosts()
+        // периодически проверять новые посты
+        viewModelScope.launch {
+            while (true) {
+                delay(60_000L)
+                checkForNewer()
+            }
+        }
     }
 
-    fun loadPosts() {
-        viewModelScope.launch {
-            try {
-                _data.value = _data.value?.copy(loading = true, error = false)
-                repository.getAll() // результат попадёт в Room и вернётся через подписку.
-                _data.value = _data.value?.copy(
-                    loading = false,
-                    empty = _data.value?.posts?.isEmpty() ?: true,
-                )
-            } catch (e: Exception) {
-                _data.value = _data.value?.copy(loading = false, error = true)
-            }
+    fun loadPosts() = viewModelScope.launch {
+        try {
+            _data.update { it.copy(loading = true, error = false) }
+            repository.getAll()
+            _data.update { it.copy(loading = false) }
+        } catch (e: Exception) {
+            _data.update { it.copy(loading = false, error = true) }
+        }
+    }
+
+    fun checkForNewer() = viewModelScope.launch {
+        try {
+            repository.getNewer()
+            // новые посты попадут в Room как isVisible = false,
+            // hiddenCount обновится через Flow и newCount изменится
+        } catch (e: Exception) {
+            _errorEvent.value = "Ошибка при загрузке новых постов"
+        }
+    }
+
+    fun showNewPosts() = viewModelScope.launch {
+        try {
+            repository.showAllHidden()
+            // hiddenCount станет 0, newCount обновится сам
+        } catch (e: Exception) {
+            _errorEvent.value = "Не удалось показать новые посты"
         }
     }
 
@@ -89,7 +123,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.repost(parentId, trimmed)
-                // запись появится в Room → UI обновится сам
+                // запись появится в Room и UI обновится сам
             } catch (e: Exception) {
                 _errorEvent.value = "Ошибка соединения с сервером. Попробуйте ещё раз."
             }
@@ -108,7 +142,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 repository.save(toSave)
                 // после успешного ответа репозиторий обновит Room,
                 // и новый/обновлённый пост сам попадёт в ленту
-
                 edited.value = emptyPost
                 _postCreated.value = Unit
             } catch (e: Exception) {

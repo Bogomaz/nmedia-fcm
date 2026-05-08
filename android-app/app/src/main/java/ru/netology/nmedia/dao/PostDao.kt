@@ -1,17 +1,32 @@
 package ru.netology.nmedia.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.entity.PostEntity
+import ru.netology.nmedia.entity.toEntity
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM PostEntity ORDER BY localId DESC")
-    fun getAll(): LiveData<List<PostEntity>>
+    @Query("SELECT * FROM PostEntity WHERE isVisible = 1 ORDER BY localId DESC")
+    fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT COUNT(*) == 0 FROM PostEntity")
+    suspend fun isEmpty(): Boolean
+
+    // количество "новых" постов (visible=0)
+    @Query("SELECT COUNT(*) FROM PostEntity WHERE isVisible = 0")
+    fun getHiddenCount(): Flow<Int>
+
+    // пометить все скрытые как видимые
+    @Query("UPDATE PostEntity SET isVisible = 1 WHERE isVisible = 0")
+    suspend fun showAllHidden()
+
+    @Query("SELECT MAX(serverId) FROM PostEntity")
+    suspend fun getMaxServerId(): Long?
 
     @Query("SELECT * FROM PostEntity WHERE localId = :localId")
     suspend fun getByLocalId(localId: Long): PostEntity?
@@ -35,9 +50,7 @@ interface PostDao {
             post.localId
         }
 
-//    suspend fun updateContentById(id: Long, text: String)
-//    suspend fun save(post: PostEntity) =
-//        if (post.id == 0L) insert(post) else updateContentById(post.id, post.text)
+
 
     @Query("""
         UPDATE PostEntity SET 

@@ -34,6 +34,7 @@
 
     <string name="notification_user_new_post">%1$s create new post</string>
     <string name="notification_post_by">Author: %1$s</string>
+    <string name = "new_posts_default">New posts (%1$d)</string>
 
 
 </resources>

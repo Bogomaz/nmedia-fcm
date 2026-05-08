@@ -17,7 +17,8 @@ import ru.netology.nmedia_server.enumeration.AttachmentType
 @Entity
 data class PostEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) var id: Long,
-    var authorId: Long, // no relations for simplicity
+    var author: String,
+    var authorAvatar: String?,
     @Column(columnDefinition = "TEXT")
     var content: String,
     var published: Long,
@@ -26,12 +27,13 @@ data class PostEntity(
     @Embedded
     var attachment: AttachmentEmbeddable?,
 ) {
-    fun toDto() = Post(id, authorId, content, published, likedByMe, likes, attachment?.toDto())
+    fun toDto() = Post(id, author, authorAvatar, content, published, likedByMe, likes, attachment?.toDto())
 
     companion object {
         fun fromDto(dto: Post) = PostEntity(
             dto.id,
-            dto.authorId,
+            dto.author,
+            dto.authorAvatar,
             dto.content,
             dto.published,
             dto.likedByMe,
@@ -45,7 +47,7 @@ data class PostEntity(
 data class AttachmentEmbeddable(
     var url: String,
     @Column(columnDefinition = "TEXT")
-    var description: String,
+    var description: String?,
     @Enumerated(EnumType.STRING)
     var type: AttachmentType,
 ) {

@@ -8,10 +8,15 @@ import ru.netology.nmedia_server.service.PostService
 @RequestMapping("/api/posts", "/api/slow/posts")
 class PostController(private val service: PostService) {
     @GetMapping
+    // TODO: uncomment for 500 status code generation
+    // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun getAll() = service.getAll()
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long) = service.getById(id)
+
+    @GetMapping("/{id}/newer")
+    fun getNewer(@PathVariable id: Long) = service.getNewer(id)
 
     @PostMapping
     fun save(@RequestBody dto: Post) = service.save(dto)

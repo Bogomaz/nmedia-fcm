@@ -38,9 +38,18 @@ private val retrofit = Retrofit.Builder()
     .client(client)
     .build()
 
+private val logging = HttpLoggingInterceptor().apply {
+    if (BuildConfig.DEBUG) {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+}
+
 interface PostApiService {
     @GET("api/posts")
     suspend fun getAll(): List<Post>
+
+    @GET("api/posts/{id}/newer")
+    suspend fun getNewer(@Path("id") id: Long): List<Post>
 
     @POST("api/posts")
     suspend fun savePost(@Body post: Post): Post

@@ -26,6 +26,8 @@ class CommentService(private val repository: CommentRepository) {
         .orElse(
             CommentEntity.fromDto(
                 dto.copy(
+                    author = "Student",
+                    authorAvatar = "netology.jpg",
                     likes = 0,
                     likedByMe = false,
                     published = OffsetDateTime.now().toEpochSecond()
@@ -33,8 +35,7 @@ class CommentService(private val repository: CommentRepository) {
             )
         )
         .let {
-            it.content = dto.content
-            if (it.id == 0L) repository.save(it)
+            if (it.id == 0L) repository.save(it) else it.content = dto.content
             it
         }.toDto()
 
@@ -60,4 +61,15 @@ class CommentService(private val repository: CommentRepository) {
 
     fun removeAllByPostId(postId: Long): Unit = repository
         .removeAllByPostId(postId)
+
+    fun saveInitial(dto: Comment): Comment = CommentEntity.fromDto(
+        dto.copy(
+            likes = 0,
+            likedByMe = false,
+            published = OffsetDateTime.now().toEpochSecond()
+        )
+    )
+        .let {
+            repository.save(it)
+        }.toDto()
 }

@@ -15,6 +15,8 @@ import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.viewmodel.PostViewModel
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.interfaces.PostListener
 import ru.netology.nmedia.dto.EditMode
 import ru.netology.nmedia.utils.editMode
@@ -47,6 +49,7 @@ class FeedFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadPosts()
+            viewModel.checkForNewer()
         }
 
         val adapter = PostsAdapter(object : PostListener {
@@ -96,14 +99,25 @@ class FeedFragment : Fragment() {
         })
 
         binding.postList.adapter = adapter // созданный адаптер помещаем в Recycler View с постами
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.data.collect { state ->
+                adapter.submitList(state.posts)
+                binding.progress.isVisible = state.loading
+                binding.errorGroup.isVisible = state.error
+                binding.empty.isVisible = state.empty
+                binding.swipeRefresh.isRefreshing = state.loading
 
-        viewModel.data.observe(viewLifecycleOwner){state ->
-            adapter.submitList(state.posts)
-            binding.progress.isVisible = state.loading
-            binding.errorGroup.isVisible = state.error
-            binding.empty.isVisible = state.empty
-
-            binding.swipeRefresh.isRefreshing = state.loading
+                // плашка новых постов
+                binding.newPostsCard.isVisible = state.newCount > 0
+                if (state.newCount > 0) {
+                    binding.newPostsText.text =
+                        getString(R.string.new_posts_default, state.newCount)
+                }
+            }
+        }
+        binding.newPostsCard.setOnClickListener {
+            viewModel.showNewPosts()
+            binding.postList.smoothScrollToPosition(0)
         }
 
         binding.retry.setOnClickListener {

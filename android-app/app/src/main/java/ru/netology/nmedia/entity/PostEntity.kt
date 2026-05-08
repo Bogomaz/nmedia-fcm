@@ -29,6 +29,7 @@ data class PostEntity (
     val commentsCount: Int = 0,
     val viewsCount: Int = 0,
     val repostsCount: Int = 0,
+    val isVisible: Boolean = true,
 ){
     fun toDto() = Post(
         id = localId,
@@ -62,6 +63,7 @@ data class PostEntity (
             commentsCount = post.commentsCount,
             viewsCount = post.viewsCount,
             repostsCount = post.repostsCount,
+            isVisible = true,
         )
     }
 }

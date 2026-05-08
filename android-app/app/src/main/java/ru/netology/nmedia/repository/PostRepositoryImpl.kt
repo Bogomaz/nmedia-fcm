@@ -1,49 +1,35 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.map
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.dto.Author
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toDto
-import ru.netology.nmedia.entity.toEntity
+
 
 
 class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
-    //override val data = dao.getAll().map(List<PostEntity>::toDto)
-    override val data = dao.getAll().map { entities -> entities.toDto() }
+    override val data: Flow<List<Post>> = dao.getAll().map { entities -> entities.toDto() }
+    override val hiddenCount: Flow<Int> = dao.getHiddenCount()
+
     private val api = PostApi.service
 
     override suspend fun getAll(): List<Post> {
         val postsFromServer = api.getAll()
 
-        // Добавляем авторов и сразу раскладываем:
-        //    serverId = id с сервера, локальный id пока 0.
+        postsFromServer.forEach {
+            android.util.Log.d(
+                "POSTS",
+                "id=${it.id}, author=${it.author}, avatar=${it.authorAvatar}"
+            )
+        }
+
         val enriched = postsFromServer.map { postFromServer ->
-            val withAuthor = try {
-                val author: Author = api.getAuthorById(postFromServer.authorId)
-                postFromServer.copy(
-                    author = author.name,
-                    authorAvatar = author.avatar,
-                )
-            } catch (e: Exception) {
-                if (postFromServer.authorId == 0L) {
-                    postFromServer.copy(
-                        author = "Студент",
-                        authorAvatar = "noname.png",
-                    )
-                } else {
-                    postFromServer.copy(
-                        author = "Noname",
-                        authorAvatar = null,
-                    )
-                }
-            }
-            // id с сервера кладём в serverId, локальный пока 0
-            withAuthor.copy(
+            postFromServer.copy(
                 id = 0L,
-                serverId = withAuthor.id,
+                serverId = postFromServer.id,
             )
         }
 
@@ -72,6 +58,58 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
 
         return enriched
     }
+
+
+    override suspend fun showAllHidden() {
+        dao.showAllHidden()
+    }
+
+    override suspend fun getNewer(): Int {
+        // Берём максимальный serverId из локальной БД
+        val maxServerId = dao.getMaxServerId() ?: 0L
+        if (maxServerId == 0L) return 0
+
+        // Просим у сервера посты новее этого id
+        val newerFromServer = api.getNewer(maxServerId)
+        if (newerFromServer.isEmpty()) return 0
+
+        // Подготавливаем Post:
+        //    - id локальный пока 0
+        //    - serverId = id с сервера
+        val prepared = newerFromServer.map { postFromServer ->
+            postFromServer.copy(
+                id = 0L,
+                serverId = postFromServer.id,
+            )
+        }
+
+        // Сохраняем в Room как "скрытые" (isVisible = false), если записи ещё нет;
+        // если есть — обновляем данные, но не трогаем видимость
+        for (post in prepared) {
+            val serverId = post.serverId ?: continue
+            val existing = dao.getByServerId(serverId)
+
+            val entity = if (existing != null) {
+                // обновляем существующую запись, сохраняя её localId и isVisible
+                PostEntity.fromDto(
+                    post.copy(id = existing.localId)
+                ).copy(isVisible = existing.isVisible)
+            } else {
+                // новый пост: по умолчанию скрытый
+                PostEntity.fromDto(post).copy(isVisible = false)
+            }
+
+            if (existing != null) {
+                dao.update(entity)
+            } else {
+                dao.insert(entity)
+            }
+        }
+
+        // Возвращаем количество новых записей с сервера
+        return prepared.size
+    }
+
 
     override suspend fun save(post: Post): Post {
         // Сохраняем только локально без serverId и получаем localId
@@ -126,8 +164,8 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun likeById(id: Long): Post {
-        val entity = dao.getByLocalId(id) ?: return data.value?.first { it.id == id }
-            ?: throw IllegalStateException()
+        val entity = dao.getByLocalId(id)
+            ?: throw IllegalStateException("Пост с localId=$id не найден")
         val serverId = entity.serverId ?: return entity.toDto()
 
         val updatedFromServer = api.likeById(serverId)
@@ -147,8 +185,8 @@ class PostRepositoryImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun unlikeById(id: Long): Post {
-        val entity = dao.getByLocalId(id) ?: return data.value?.first { it.id == id }
-            ?: throw IllegalStateException()
+        val entity = dao.getByLocalId(id)
+            ?: throw IllegalStateException("Пост с localId=$id не найден")
         val serverId = entity.serverId ?: return entity.toDto()
 
         val updatedFromServer = api.unlikeById(serverId)

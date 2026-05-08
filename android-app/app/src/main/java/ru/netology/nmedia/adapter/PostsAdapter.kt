@@ -51,6 +51,8 @@ class PostViewHolder(
         author.text = post.author
 
         val avatarName = post.authorAvatar ?: "noname.png"
+        val url = avatarUrl(avatarName)
+        android.util.Log.d("AVATAR", "postId=${post.id}, url=$url")
         Glide.with(avatar)
             .load(avatarUrl(avatarName))
             .timeout(15_000)

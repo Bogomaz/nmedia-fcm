@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentReadPostBinding
@@ -19,6 +20,8 @@ import kotlin.getValue
 import ru.netology.nmedia.utils.postId
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.api.avatarUrl
 import ru.netology.nmedia.api.imageUrl
 
@@ -100,41 +103,43 @@ class ReadPostFragment : Fragment() {
         }
 
         // Обновление данных при изменении
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = state.posts.find { it.id == postId } ?: return@observe
-            currentPost = post
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.data.collectLatest { state ->
+                val post = state.posts.find { it.id == postId } ?: return@collectLatest
+                currentPost = post
 
-            binding.apply {
-                author.text = post.author
+                binding.apply {
+                    author.text = post.author
 
-                val avatarName = post.authorAvatar ?: "noname.png"
-                Glide.with(avatar)
-                    .load(avatarUrl(avatarName))
-                    .timeout(15_000)
-                    .transform(CircleCrop())
-                    .into(avatar)
-
-                published.text = formatUnixTime(post.publishedDate)
-                content.text = post.text
-
-                val att = post.attachment
-                if (att != null && att.type == "IMAGE") {
-                    attachmentImage.visibility = View.VISIBLE
-                    Glide.with(attachmentImage)
-                        .load(imageUrl(att.url))
+                    val avatarName = post.authorAvatar ?: "noname.png"
+                    Glide.with(avatar)
+                        .load(avatarUrl(avatarName))
                         .timeout(15_000)
-                        .placeholder(R.drawable.mock)
-                        .error(R.drawable.mock)
-                        .into(attachmentImage)
-                } else {
-                    attachmentImage.visibility = View.GONE
-                }
+                        .transform(CircleCrop())
+                        .into(avatar)
 
-                likes.isChecked = post.isLiked
-                likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
-                repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
-                comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
-                views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+                    published.text = formatUnixTime(post.publishedDate)
+                    content.text = post.text
+
+                    val att = post.attachment
+                    if (att != null && att.type == "IMAGE") {
+                        attachmentImage.visibility = View.VISIBLE
+                        Glide.with(attachmentImage)
+                            .load(imageUrl(att.url))
+                            .timeout(15_000)
+                            .placeholder(R.drawable.mock)
+                            .error(R.drawable.mock)
+                            .into(attachmentImage)
+                    } else {
+                        attachmentImage.visibility = View.GONE
+                    }
+
+                    likes.isChecked = post.isLiked
+                    likes.text = ConvertNumberService.convertNumberIntoText(post.likesCount)
+                    repost.text = ConvertNumberService.convertNumberIntoText(post.repostsCount)
+                    comments.text = ConvertNumberService.convertNumberIntoText(post.commentsCount)
+                    views.text = ConvertNumberService.convertNumberIntoText(post.viewsCount)
+                }
             }
         }
     }

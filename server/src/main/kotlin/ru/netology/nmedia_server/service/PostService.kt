@@ -1,16 +1,15 @@
 package ru.netology.nmedia_server.service
 
-import jakarta.annotation.PostConstruct
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.repository.findByIdOrNull
-import ru.netology.nmedia_server.dto.Attachment
 import ru.netology.nmedia_server.dto.Post
 import ru.netology.nmedia_server.entity.PostEntity
 import ru.netology.nmedia_server.exception.NotFoundException
 import ru.netology.nmedia_server.repository.PostRepository
 import java.time.OffsetDateTime
+
 
 @Service
 @Transactional
@@ -27,27 +26,34 @@ class PostService(
         .map { it.toDto() }
         .orElseThrow(::NotFoundException)
 
+    fun getNewer(id: Long): List<Post> = repository
+        .findAllByIdGreaterThan(id, Sort.by(Sort.Direction.DESC, "id"))
+        .map { it.toDto() }
+
     fun save(dto: Post): Post = repository
         .findById(dto.id)
         .orElse(
             PostEntity.fromDto(
                 dto.copy(
-//                    likes = 0,
-//                    likedByMe = false,
+                    author = "Student",
+                    authorAvatar = "netology.jpg",
+                    likes = 0,
+                    likedByMe = false,
                     published = OffsetDateTime.now().toEpochSecond()
                 )
             )
         )
         .let {
-            it.content = dto.content
-            if (it.id == 0L) repository.save(it)
+            if (it.id == 0L) repository.save(it) else it.content = dto.content
             it
         }.toDto()
 
-    fun removeById(id: Long): Unit = repository.deleteById(id)
-        .also {
-            commentService.removeAllByPostId(id)
-        }
+    fun removeById(id: Long) {
+        repository.findByIdOrNull(id)
+            ?.also(repository::delete)
+            ?.also { commentService.removeAllByPostId(id) }
+    }
+
 
     fun likeById(id: Long): Post = repository
         .findById(id)
@@ -66,4 +72,15 @@ class PostService(
             likedByMe = false
         }
         .toDto()
+
+    fun saveInitial(dto: Post) = PostEntity.fromDto(
+        dto.copy(
+            likes = 0,
+            likedByMe = false,
+            published = OffsetDateTime.now().toEpochSecond()
+        )
+    ).let {
+        repository.save(it)
+    }.toDto()
+
 }
